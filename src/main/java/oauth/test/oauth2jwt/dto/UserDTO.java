@@ -9,4 +9,5 @@ public class UserDTO {
     private String role;
     private String name;
     private String username;
+    //TODO: 필요시 email field 추가
 }

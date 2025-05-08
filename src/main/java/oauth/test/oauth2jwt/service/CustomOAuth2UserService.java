@@ -1,6 +1,10 @@
 package oauth.test.oauth2jwt.service;
 
+import lombok.RequiredArgsConstructor;
 import oauth.test.oauth2jwt.dto.*;
+import oauth.test.oauth2jwt.entity.UserEntity;
+import oauth.test.oauth2jwt.repository.UserRepository;
+import oauth.test.oauth2jwt.util.UserMapper;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -8,7 +12,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+
+    private final UserRepository userRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -25,12 +32,28 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         String username = oAuth2Response.getProvider() + "@" + oAuth2Response.getProviderId();
 
-        UserDTO userDTO = UserDTO.builder()
-                .name(oAuth2Response.getName())
+        UserEntity user = userRepository.findByUsername(username);
+
+        if (user == null) {
+            user = registerOAuthUser(username, oAuth2Response);
+        } else {
+            user.setEmail(oAuth2Response.getEmail());
+            user.setName(oAuth2Response.getName());
+            userRepository.save(user);
+        }
+
+        return new CustomOAuth2User(UserMapper.toDTO(user));
+    }
+
+    private UserEntity registerOAuthUser(String username, OAuth2Response oAuth2Response) {
+        UserEntity userEntity = UserEntity.builder()
                 .username(username)
+                .email(oAuth2Response.getEmail())
+                .name(oAuth2Response.getName())
                 .role("ROLE_USER")
                 .build();
 
-        return new CustomOAuth2User(userDTO);
+        userRepository.save(userEntity);
+        return userEntity;
     }
 }
