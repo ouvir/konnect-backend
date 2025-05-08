@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import oauth.test.oauth2jwt.dto.CustomOAuth2User;
 import oauth.test.oauth2jwt.jwt.JWTUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -21,6 +22,9 @@ import java.util.Iterator;
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JWTUtil jwtUtil;
+
+    @Value("${client.url}")
+    String clientUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -42,7 +46,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         // Cookie에 담아 전달
         response.addCookie(createCookie("Authorization", token));
-        response.sendRedirect("http://localhost:8080/"); // 클라이언트 url
+        response.sendRedirect(clientUrl); // 클라이언트 url
     }
 
     private Cookie createCookie(String key, String value) {
