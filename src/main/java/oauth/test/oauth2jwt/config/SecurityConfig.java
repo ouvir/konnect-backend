@@ -2,16 +2,17 @@ package oauth.test.oauth2jwt.config;
 
 
 import lombok.RequiredArgsConstructor;
+import oauth.test.oauth2jwt.jwt.JWTFilter;
 import oauth.test.oauth2jwt.jwt.JWTUtil;
 import oauth.test.oauth2jwt.oauth2.CustomSuccessHandler;
 import oauth.test.oauth2jwt.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -35,6 +36,12 @@ public class SecurityConfig {
         //HTTP Basic 인증 방식 disable
         http
                 .httpBasic((auth) -> auth.disable());
+
+        //JWTFilter 추가
+        // (위치는 UsernamePasswordAuthenticationFilter 전에 등록)
+        http
+                .addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+
 
         //oauth2 -> oauth2 를 통해, 인증 진행
         http
