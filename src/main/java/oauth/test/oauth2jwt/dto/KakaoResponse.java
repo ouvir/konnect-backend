@@ -2,7 +2,6 @@ package oauth.test.oauth2jwt.dto;
 
 import java.util.Map;
 
-//TODO 1.kakao 연동 (생성자, 오버라이드)
 public class KakaoResponse implements OAuth2Response {
     private final Map<String, Object> attribute;
 
@@ -11,21 +10,23 @@ public class KakaoResponse implements OAuth2Response {
     }
     @Override
     public String getProvider() {
-        return "";
+        return "kakao";
     }
 
     @Override
     public String getProviderId() {
-        return "";
+        return attribute.get("id").toString();
     }
 
     @Override
     public String getEmail() {
-        return "";
+        return attribute.get("email").toString();
     }
 
     @Override
     public String getName() {
-        return "";
+        Map<String, Object> kakaoAccount = (Map<String, Object>) attribute.get("kakao_account");
+        Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+        return profile.get("nickname").toString();
     }
 }
