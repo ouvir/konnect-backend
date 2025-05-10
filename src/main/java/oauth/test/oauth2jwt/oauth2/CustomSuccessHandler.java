@@ -35,14 +35,14 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         //OAuth2User
         CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
 
-        String username = customUserDetails.getUsername();
+        Long userId = customUserDetails.getId();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String token = jwtUtil.createJwt(username, role, 60*60*60L);
+        String token = jwtUtil.createJwt(userId, role, 60*60*3L); // 3시간
 
         // Cookie에 담아 전달
         response.addCookie(createCookie("Authorization", token));
@@ -54,8 +54,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         cookie.setMaxAge(60*60*60);
         //cookie.setSecure(true); //https만 가능하게 설정
         cookie.setPath("/");
-        cookie.setHttpOnly(true); //js가 cookie 못가져가도록 설정
-
+//        cookie.setHttpOnly(true); //js가 cookie 못가져가도록 설정
         return cookie;
     }
 }

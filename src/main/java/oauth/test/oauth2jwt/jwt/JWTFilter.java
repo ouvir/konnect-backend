@@ -55,12 +55,12 @@ public class JWTFilter extends OncePerRequestFilter {
         }
 
         // get username & role from Token
-        String username = jwtUtil.getUsername(token);
+        Long userId = jwtUtil.getUserId(token);
         String role = jwtUtil.getRole(token);
 
         // init userDTO
         UserDTO userDTO = UserDTO.builder()
-                .username(username)
+                .id(userId)
                 .role(role)
                 .build();
 

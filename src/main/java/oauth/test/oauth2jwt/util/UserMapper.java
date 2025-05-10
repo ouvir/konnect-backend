@@ -6,6 +6,7 @@ import oauth.test.oauth2jwt.entity.UserEntity;
 public class UserMapper {
     public static UserDTO toDTO(UserEntity entity) {
         return UserDTO.builder()
+                .id(entity.getId())
                 .username(entity.getUsername())
                 .name(entity.getName())
                 .role(entity.getRole())
