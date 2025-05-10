@@ -24,7 +24,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final JWTUtil jwtUtil;
 
     @Value("${client.url}")
-    String clientUrl;
+    private String clientUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -45,16 +45,9 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String token = jwtUtil.createJwt(userId, role);
 
         // Cookie에 담아 전달
-        response.addCookie(createCookie("Authorization", token));
-        response.sendRedirect(clientUrl); // 클라이언트 url
+        response.addCookie(jwtUtil.createCookie("Authorization", token));
+        response.sendRedirect(clientUrl); // 클라이언트 url TODO oauth 성공 시, 특정 url로 이동
     }
 
-    private Cookie createCookie(String key, String value) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(60*60*60);
-        //cookie.setSecure(true); //https만 가능하게 설정
-        cookie.setPath("/");
-//        cookie.setHttpOnly(true); //js가 cookie 못가져가도록 설정
-        return cookie;
-    }
+
 }
