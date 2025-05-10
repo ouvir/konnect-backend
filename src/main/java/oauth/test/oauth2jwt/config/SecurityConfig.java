@@ -33,6 +33,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
     private final JWTUtil jwtUtil;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Value("${client.url}")
     String clientUrl;
@@ -54,7 +55,12 @@ public class SecurityConfig {
 
                     return configuration;
                 }));
-
+        
+        // 인증 오류 핸들링 추가(JWT 만료)
+        http
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                );
 
         //csrf disable(어차피 JWT 사용해서 stateless 상태로 관리할 것이므로 필요 X)
         http

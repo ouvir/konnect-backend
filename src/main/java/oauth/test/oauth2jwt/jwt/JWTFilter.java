@@ -1,5 +1,6 @@
 package oauth.test.oauth2jwt.jwt;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -49,9 +50,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // Token ExpiredTime 검증
         if (jwtUtil.isExpired(token)) {
-            log.debug("token expired");
-            filterChain.doFilter(request, response);
-            return;
+            throw new ExpiredJwtException(null, null, "JWT expired");
         }
 
         // get username & role from Token
