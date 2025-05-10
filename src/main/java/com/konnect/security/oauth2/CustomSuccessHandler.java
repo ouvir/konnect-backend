@@ -1,11 +1,11 @@
 package com.konnect.security.oauth2;
 
+import com.konnect.dto.CustomUserPrincipal;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import com.konnect.dto.CustomOAuth2User;
 import com.konnect.security.jwt.JWTUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -33,7 +33,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     ) throws IOException, ServletException {
 
         //OAuth2User
-        CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
+        CustomUserPrincipal customUserDetails = (CustomUserPrincipal) authentication.getPrincipal();
 
         Long userId = customUserDetails.getId();
 

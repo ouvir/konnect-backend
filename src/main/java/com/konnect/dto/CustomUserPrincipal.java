@@ -2,6 +2,7 @@ package com.konnect.dto;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
@@ -9,10 +10,10 @@ import java.util.Collection;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class CustomOAuth2User implements OAuth2User {
-
+public class CustomUserPrincipal implements OAuth2User, UserDetails {
     private final UserDTO userDTO;
 
+    // ------  OAuth2User  ------
     @Override
     public Map<String, Object> getAttributes() {
         return Map.of();
@@ -39,5 +40,17 @@ public class CustomOAuth2User implements OAuth2User {
 
     public Long getId() {
         return userDTO.getUserId();
+    }
+
+
+    // ------  UserDetails  ------
+    @Override
+    public String getPassword() {
+        return userDTO.getPassword();
+    }
+
+    @Override
+    public String getUsername() {
+        return userDTO.getEmail();
     }
 }
