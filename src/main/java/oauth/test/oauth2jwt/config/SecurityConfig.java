@@ -3,6 +3,7 @@ package oauth.test.oauth2jwt.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import oauth.test.oauth2jwt.jwt.CustomAuthenticationEntryPoint;
 import oauth.test.oauth2jwt.jwt.JWTFilter;
 import oauth.test.oauth2jwt.jwt.JWTUtil;
 import oauth.test.oauth2jwt.oauth2.CustomSuccessHandler;
@@ -10,6 +11,8 @@ import oauth.test.oauth2jwt.service.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,6 +29,7 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final Environment env;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
     private final JWTUtil jwtUtil;
@@ -80,9 +84,24 @@ public class SecurityConfig {
                 );
         //경로별 인가 작업
         http
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/","/login").permitAll()
-                        .anyRequest().authenticated());
+                .authorizeHttpRequests(auth -> {
+                    // 공통 허용 경로
+                    auth.requestMatchers("/").permitAll();
+
+                    // dev 환경일 때, Swagger 경로 허용
+                    if (env.acceptsProfiles(Profiles.of("dev"))) {
+                        auth.requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll();
+                    }
+
+                    // 나머지는 인증 필요
+                    auth.anyRequest().authenticated();
+                });
 
         //세션 설정 : STATELESS
         http
