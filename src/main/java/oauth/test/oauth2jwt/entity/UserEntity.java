@@ -1,9 +1,7 @@
 package oauth.test.oauth2jwt.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -14,19 +12,31 @@ import lombok.*;
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    private String username;
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column
+    private String password;
+
+    @Column(nullable = false, length = 20)
     private String role;
 
+    @Column(name = "oauth_code")
+    private String oauthCode;
+
     @Builder
-    public UserEntity(String username, String name, String email, String role) {
-        this.username = username;
+    public UserEntity(String name, String email, String password, String role, String oauthCode) {
         this.name = name;
         this.email = email;
+        this.password = password;
         this.role = role;
+        this.oauthCode = oauthCode;
     }
 
-    // TODO: password 추가
 }

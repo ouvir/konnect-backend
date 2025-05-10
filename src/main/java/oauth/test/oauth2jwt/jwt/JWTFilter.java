@@ -60,7 +60,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // init userDTO
         UserDTO userDTO = UserDTO.builder()
-                .id(userId)
+                .userId(userId)
                 .role(role)
                 .build();
 

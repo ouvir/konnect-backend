@@ -6,18 +6,12 @@ import oauth.test.oauth2jwt.entity.UserEntity;
 public class UserMapper {
     public static UserDTO toDTO(UserEntity entity) {
         return UserDTO.builder()
-                .id(entity.getId())
-                .username(entity.getUsername())
+                .userId(entity.getUserId())
                 .name(entity.getName())
+                .email(entity.getEmail())
+                .password(entity.getPassword())
                 .role(entity.getRole())
-                .build();
-    }
-
-    public static UserEntity toEntity(UserDTO dto) {
-        return UserEntity.builder()
-                .username(dto.getUsername())
-                .name(dto.getName())
-                .role(dto.getRole())
+                .oauthCode(entity.getOauthCode())
                 .build();
     }
 }

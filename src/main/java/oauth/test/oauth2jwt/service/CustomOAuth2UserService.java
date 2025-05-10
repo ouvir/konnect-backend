@@ -30,27 +30,28 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             default -> null;
         };
 
-        String username = oAuth2Response.getProvider() + "@" + oAuth2Response.getProviderId();
+        String oauthCode = oAuth2Response.getProvider() + "@" + oAuth2Response.getProviderId();
 
-        UserEntity user = userRepository.findByUsername(username);
+        UserEntity user = userRepository.findByOauthCode(oauthCode);
 
         if (user == null) {
-            user = registerOAuthUser(username, oAuth2Response);
+            user = registerOAuthUser(oauthCode, oAuth2Response);
         } else {
-            user.setEmail(oAuth2Response.getEmail());
             user.setName(oAuth2Response.getName());
+            user.setEmail(oAuth2Response.getEmail());
             userRepository.save(user);
         }
 
         return new CustomOAuth2User(UserMapper.toDTO(user));
     }
 
-    private UserEntity registerOAuthUser(String username, OAuth2Response oAuth2Response) {
+    private UserEntity registerOAuthUser(String oauthCode, OAuth2Response oAuth2Response) {
         UserEntity userEntity = UserEntity.builder()
-                .username(username)
-                .email(oAuth2Response.getEmail())
                 .name(oAuth2Response.getName())
+                .email(oAuth2Response.getEmail())
+                .password(null)
                 .role("ROLE_USER")
+                .oauthCode(oauthCode)
                 .build();
 
         userRepository.save(userEntity);
