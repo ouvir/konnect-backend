@@ -8,11 +8,11 @@
         <version>3.4.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>oauth.test</groupId>
-    <artifactId>OAuth2JWT</artifactId>
+    <groupId>com.konnect</groupId>
+    <artifactId>konnect</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>OAuth2JWT</name>
-    <description>OAuth2JWT</description>
+    <name>Konnect 서버</name>
+    <description>Konnect 웹사이트 서비스</description>
     <url/>
     <licenses>
         <license/>
@@ -33,6 +33,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -56,12 +60,6 @@
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.30</version> <!-- 최신 버전 권장 -->
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
