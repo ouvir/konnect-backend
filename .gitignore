@@ -1,10 +1,16 @@
+# ────────────────────────── 공통 ──────────────────────────
 HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
 
-### STS ###
+# ────────────────────────── Gradle ─────────────────────────
+.gradle/                       # 전역 캐시
+build/                         # 루트 build 결과
+gradle/                        # gradle-wrapper JAR·프로퍼티
+!**/src/main/**/build/         # 소스 내부 build 폴더만 예외
+!**/src/test/**/build/
+
+# gradle-wrapper 파일(gradlew, gradlew.bat)은 커밋해야 하므로 제외하지 않습니다
+
+# ────────────────────────── STS ───────────────────────────
 .apt_generated
 .classpath
 .factorypath
@@ -13,26 +19,23 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
+# ─────────────────────── IntelliJ IDEA ────────────────────
 .idea
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# ───────────────────────── NetBeans ───────────────────────
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
+# ───────────────────────── VS Code ─────────────────────────
 .vscode/
 
-### secret keys ###
-/src/main/resources/application-secret.properties
-/src/main/resources/application-prod.properties
-/src/main/resources/application-dev.properties
+# ───────────────────────── Secret Keys ─────────────────────
+/src/main/resources/application-secret.yml
+/src/main/resources/application-prod.yml
+/src/main/resources/application-dev.yml
