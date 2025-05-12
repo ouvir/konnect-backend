@@ -1,13 +1,14 @@
 spring:
   application:
     name: Konnect
-
   config:
-    import: "classpath:application-secret.yml"
+    import:
+      - "classpath:application-secret.yml"
+      - file:.env.dev[.properties]
+      - optional:file:.env[.properties]
 
-  logging:
-    level:
-      root: info
+#  profiles:
+#    active: ${SPRING_PROFILES_ACTIVE:dev}
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
