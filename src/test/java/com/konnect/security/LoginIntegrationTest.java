@@ -48,21 +48,34 @@ public class LoginIntegrationTest {
     @DisplayName("로그인 성공 - JWT 쿠키 발급 확인")
     void loginSuccess() throws Exception {
         mockMvc.perform(post("/login")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .param("email", "test@konnect.com")
-                        .param("password", "test1234")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(cookie().exists("Authorization"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                """
+                                    {
+                                      "email": "test@konnect.com",
+                                      "password": "test1234"
+                                    }
+                                """
+                        ).accept(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk())
+                        .andExpect(cookie().exists("Authorization"));
     }
 
     @Test
     @DisplayName("로그인 실패 - 비밀번호 틀림")
     void loginFailWrongPassword() throws Exception {
         mockMvc.perform(post("/login")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .param("email", "test@konnect.com")
-                        .param("password", "wrongpassword"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                """
+                                    {
+                                      "email": "test@konnect.com",
+                                      "password": "wrongpassword"
+                                    }
+                                """
+                        )
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
+
     }
 }
