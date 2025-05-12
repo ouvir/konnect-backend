@@ -2,10 +2,10 @@
 HELP.md
 
 # ────────────────────────── Gradle ─────────────────────────
-.gradle/                       # 전역 캐시
-build/                         # 루트 build 결과
-gradle/                        # gradle-wrapper JAR·프로퍼티
-!**/src/main/**/build/         # 소스 내부 build 폴더만 예외
+.gradle/
+build/
+gradle/
+!**/src/main/**/build/
 !**/src/test/**/build/
 
 # gradle-wrapper 파일(gradlew, gradlew.bat)은 커밋해야 하므로 제외하지 않습니다
@@ -24,6 +24,7 @@ gradle/                        # gradle-wrapper JAR·프로퍼티
 *.iws
 *.iml
 *.ipr
+.idea/
 
 # ───────────────────────── NetBeans ───────────────────────
 /nbproject/private/
