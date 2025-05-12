@@ -22,5 +22,5 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
-  client:
-    url: ${CLIENT_URL}
+client:
+  url: ${CLIENT_URL}
