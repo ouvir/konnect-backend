@@ -1,6 +1,7 @@
 spring:
   application:
     name: Konnect
+
   config:
     import:
       - "classpath:application-secret.yml"
