@@ -1,5 +1,6 @@
 package com.konnect.security.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.konnect.dto.CustomUserPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 
 @RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
@@ -26,20 +28,28 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private String clientUrl;
 
     @Override
-    public Authentication attemptAuthentication(
-            HttpServletRequest request, HttpServletResponse response
+    public Authentication attemptAuthentication(HttpServletRequest request,
+                                                HttpServletResponse response
     ) throws AuthenticationException {
 
-        // 요청 파라미터에서 email, password 추출
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        System.out.println(email + " " + password);
+        try {
+            // JSON 요청 본문에서 email, password 추출
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, String> credentials = objectMapper.readValue(request.getInputStream(), Map.class);
 
-        //스프링 시큐리티에서 username과 password를 검증하기 위해서는 token에 담아야 함
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password, null);
+            String email = credentials.get("email");
+            String password = credentials.get("password");
 
-        //token에 담은 검증을 위한 AuthenticationManager로 전달
-        return authenticationManager.authenticate(authToken);
+            System.out.println("email: " + email + ", password: " + password);
+
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(email, password, null);
+
+            return authenticationManager.authenticate(authToken);
+
+        } catch (IOException e) {
+            throw new RuntimeException("[login]: JSON 요청 파싱 실패", e);
+        }
     }
 
     //로그인 성공시 메소드 (JWT 발급)
