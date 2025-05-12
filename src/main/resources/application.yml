@@ -2,11 +2,25 @@ spring:
   application:
     name: Konnect
 
-  profiles:
-    active: dev        # 현재 활성 프로필
+  config:
+    import: "classpath:application-secret.yml"
+
+  logging:
+    level:
+      root: info
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USER_NAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     open-in-view: false
+    hibernate:
+      ddl-auto: ${DB_DDL_AUTO}
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
-  config:
-    import: "classpath:application-secret.yml"
+  client:
+    url: ${CLIENT_URL}
