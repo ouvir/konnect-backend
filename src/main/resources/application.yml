@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: Konnect
+
+  profiles:
+    active: dev        # 현재 활성 프로필
+
+  jpa:
+    open-in-view: false
+
+  config:
+    import: "classpath:application-secret.yml"
