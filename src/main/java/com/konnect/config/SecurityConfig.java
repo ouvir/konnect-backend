@@ -91,13 +91,14 @@ public class SecurityConfig {
         //JWTFilter 추가
         // (위치는 OAuth2LoginAuthenticationFilter 이후 등록)
         http
-                .addFilterAfter(new JWTFilter(jwtUtil), OAuth2LoginAuthenticationFilter.class);
-        //LoginFilter 추가
+                .addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+
+        // login Filter `/login`
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
                         UsernamePasswordAuthenticationFilter.class);
 
-        //oauth2 -> oauth2 를 통해, 인증 진행
+        //oauth2 -> oauth2 를 통해, 인증 진행 `/oauth2/authorization/{provider}`
         http
                 .oauth2Login((oauth2) -> oauth2
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
