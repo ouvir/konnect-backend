@@ -22,8 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -68,4 +67,19 @@ public class SignupServiceTest {
                 .isInstanceOf(SignUpRuntimeException.class)
                 .hasMessage(SignUpErrorMessages.EXISTED_NAME);
     }
+
+    @Test
+    @DisplayName("이메일과 닉네임이 중복되지 않으면 회원가입이 성공한다")
+    void signUp_validateUser_IfSaveSuccess() {
+        // Given
+        SignUpDTO signUpDTO = new SignUpDTO(NAME, EMAIL, PASSWORD);
+
+        given(userRepository.existsByEmail(EMAIL)).willReturn(false);
+        given(userRepository.existsByName(NAME)).willReturn(false);
+
+        // Then
+        assertThatCode(() -> signUpService.signUp(signUpDTO))
+                .doesNotThrowAnyException();
+    }
+
 }
