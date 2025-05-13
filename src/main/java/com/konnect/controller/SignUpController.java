@@ -17,7 +17,7 @@ public class SignUpController {
 
     private final SignUpService signUpService;
 
-    @PostMapping("/join")
+    @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody SignUpDTO joinDTO) {
         try {
             signUpService.signUp(joinDTO);
