@@ -1,8 +1,7 @@
 package com.konnect.controller;
 
-import com.konnect.dto.JoinDTO;
 import com.konnect.dto.SignUpDTO;
-import com.konnect.service.JoinService;
+import com.konnect.service.SignUpService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
