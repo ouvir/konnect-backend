@@ -3,6 +3,8 @@ package com.konnect.service;
 import com.konnect.dto.SignUpDTO;
 import com.konnect.entity.UserEntity;
 import com.konnect.repository.UserRepository;
+import com.konnect.service.exception.SignUpError;
+import com.konnect.service.exception.SignUpRuntimeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,12 +23,19 @@ public class SignUpService {
         String email = signUpDTO.getEmail();
         String password = signUpDTO.getPassword();
 
-        if (userRepository.existsByname(username)) {
-            throw new RuntimeException("이미 존재하는 사용자입니다.");
-        }
+        validateUser(email, username);
 
-        // TODO: 모든 회원가입한 유저는 기본적으로 일반 회원
         UserEntity userEntity = new UserEntity(username, email, bCryptPasswordEncoder.encode(password), UserRole, null);
         userRepository.save(userEntity);
+    }
+
+    public void validateUser(String email, String name) {
+        if (userRepository.existsByEmail(email)) {
+            throw new SignUpRuntimeException(SignUpError.DUPLICATE_EMAIL);
+        }
+
+        if (userRepository.existsByName(name)) {
+            throw new SignUpRuntimeException(SignUpError.DUPLICATE_USERNAME);
+        }
     }
 }
