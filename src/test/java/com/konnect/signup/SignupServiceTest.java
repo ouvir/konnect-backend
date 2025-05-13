@@ -56,4 +56,16 @@ public class SignupServiceTest {
                 .isInstanceOf(SignUpRuntimeException.class)
                 .hasMessage(SignUpErrorMessages.EXISTED_EMAIL);
     }
+
+    @Test
+    @DisplayName("중복되는 유저명이 존재하면 에러를 반환한다.")
+    void validateDuplicateUser_throwException_IfNameAlreadyExists() {
+        // Given
+        given(userRepository.existsByName(NAME)).willReturn(true);
+
+        // Then
+        assertThatThrownBy(() -> signUpService.validateUser(EMAIL, NAME))
+                .isInstanceOf(SignUpRuntimeException.class)
+                .hasMessage(SignUpErrorMessages.EXISTED_NAME);
+    }
 }
