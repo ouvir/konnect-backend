@@ -19,7 +19,25 @@ public class AuthController {
             summary = "일반 로그인",
             description = "이메일과 비밀번호로 로그인 후 JWT 쿠키를 발급받습니다.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "로그인 성공, JWT 쿠키가 발급됨"),
+                    @ApiResponse(responseCode = "200", description = "로그인 성공(JWT 발급)",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            name = "JWT 쿠키 예시",
+                                            summary = "JWT는 쿠키에 담겨 응답",
+                                            value = """
+                                Set-Cookie: accessToken=eyJhbGciOiJIUzI1NiJ9...; Path=/; Max-Age=10800;
+                                JWT Payload:
+                                {
+                                  "userId": 1,
+                                  "role": "ROLE_USER",
+                                  "exp": 1715620000
+                                }
+                                """
+                                    )
+                            )
+                    ),
+
                     @ApiResponse(responseCode = "401", description = "로그인 실패 - 잘못된 자격 증명",
                             content = @Content(
                                     mediaType = "application/json",
