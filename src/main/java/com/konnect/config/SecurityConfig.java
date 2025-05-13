@@ -53,6 +53,12 @@ public class SecurityConfig {
     }
 
     @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
@@ -105,12 +111,11 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService))
                         .successHandler(customSuccessHandler)
                 );
-
         //경로별 인가 작업
         http
                 .authorizeHttpRequests(auth -> {
                     // 공통 허용 경로
-                    auth.requestMatchers("/","/login","/join").permitAll();
+                    auth.requestMatchers("/", "/login", "/signup").permitAll();
 
                     // dev 환경일 때, Swagger 경로 허용
                     if (env.acceptsProfiles(Profiles.of("dev"))) {
