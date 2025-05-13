@@ -42,7 +42,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userRepository.save(user);
         }
 
-        return new CustomOAuth2User(UserMapper.toDTO(user));
+        return new CustomUserPrincipal(UserMapper.toDTO(user));
     }
 
     private UserEntity registerOAuthUser(String oauthCode, OAuth2Response oAuth2Response) {

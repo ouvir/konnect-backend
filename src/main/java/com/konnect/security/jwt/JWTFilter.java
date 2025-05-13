@@ -1,5 +1,6 @@
 package com.konnect.security.jwt;
 
+import com.konnect.dto.CustomUserPrincipal;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.konnect.dto.CustomOAuth2User;
 import com.konnect.dto.UserDTO;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,6 +30,10 @@ public class JWTFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String authorization = null;
         Cookie[] cookies = request.getCookies();
+        if(cookies == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         for (Cookie cookie : cookies) {
             log.debug("Cookie: {}", cookie);
@@ -64,13 +68,13 @@ public class JWTFilter extends OncePerRequestFilter {
                 .build();
 
         // put userDTO to UserDetails
-        CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
+        CustomUserPrincipal customUserPrincipal = new CustomUserPrincipal(userDTO);
 
         // security 인증 토큰 생성
         Authentication authToken = new UsernamePasswordAuthenticationToken(
-                customOAuth2User,
+                customUserPrincipal,
                 null,
-                customOAuth2User.getAuthorities()
+                customUserPrincipal.getAuthorities()
         );
 
         // 세션에 사용자 등록

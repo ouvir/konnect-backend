@@ -1,11 +1,11 @@
 package com.konnect.security.oauth2;
 
+import com.konnect.dto.CustomUserPrincipal;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import com.konnect.dto.CustomOAuth2User;
 import com.konnect.security.jwt.JWTUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -24,7 +24,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final JWTUtil jwtUtil;
 
     @Value("${client.url}")
-    String clientUrl;
+    private String clientUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -33,7 +33,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     ) throws IOException, ServletException {
 
         //OAuth2User
-        CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
+        CustomUserPrincipal customUserDetails = (CustomUserPrincipal) authentication.getPrincipal();
 
         Long userId = customUserDetails.getId();
 
@@ -42,19 +42,12 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String token = jwtUtil.createJwt(userId, role, 60 * 60 * 1000 * 3L); // 3시간
+        String token = jwtUtil.createJwt(userId, role);
 
         // Cookie에 담아 전달
-        response.addCookie(createCookie("Authorization", token));
-        response.sendRedirect(clientUrl); // 클라이언트 url
+        response.addCookie(jwtUtil.createCookie("Authorization", token));
+        response.sendRedirect(clientUrl); // 클라이언트 url TODO oauth 성공 시, 특정 url로 이동
     }
 
-    private Cookie createCookie(String key, String value) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(60*60*60);
-        //cookie.setSecure(true); //https만 가능하게 설정
-        cookie.setPath("/");
-//        cookie.setHttpOnly(true); //js가 cookie 못가져가도록 설정
-        return cookie;
-    }
+
 }

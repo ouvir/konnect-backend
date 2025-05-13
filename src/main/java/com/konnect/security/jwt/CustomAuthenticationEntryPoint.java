@@ -16,6 +16,16 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                          AuthenticationException authException) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
         response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("{\"error\": \"Unauthorized or expired token\"}");
+
+        String json = String.format("""
+        {
+            "status": 401,
+            "error": "Unauthorized",
+            "message": "인증되지 않았거나 만료된 토큰입니다.",
+            "path": "%s"
+        }
+        """, request.getRequestURI());
+
+        response.getWriter().write(json);
     }
 }
