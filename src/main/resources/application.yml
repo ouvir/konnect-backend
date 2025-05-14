@@ -25,3 +25,14 @@ spring:
 
 client:
   url: ${CLIENT_URL}
+
+springdoc:
+  swagger-ui:
+    # "Try it out" 버튼을 GET 에서만 활성화
+    supported-submit-methods: get
+    # 알파벳 순 정렬
+    tags-sorter: alpha
+    # 메서드 순 정렬
+    operations-sorter : method
+    # 접힌 상태로 시작
+    doc-expansion : none
