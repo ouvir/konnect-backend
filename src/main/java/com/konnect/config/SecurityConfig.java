@@ -8,6 +8,7 @@ import com.konnect.security.jwt.JWTFilter;
 import com.konnect.security.jwt.JWTUtil;
 import com.konnect.security.oauth2.CustomSuccessHandler;
 import com.konnect.service.CustomOAuth2UserService;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

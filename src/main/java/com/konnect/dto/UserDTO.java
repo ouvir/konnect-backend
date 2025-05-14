@@ -19,7 +19,8 @@ public class UserDTO {
     @Schema(description = "이메일 주소", example = "user@example.com")
     private String email;
 
-    @Schema(description = "비밀번호 (요청에만 사용)", example = "P@ssw0rd123")
+    @Schema(description = "비밀번호(보안상의 이유로 항상 null 반환)",
+            example = "null")
     private String password;
 
     @Schema(description = "사용자 권한", example = "ROLE_USER")
