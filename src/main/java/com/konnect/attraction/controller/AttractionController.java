@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user/attractions")
+@RequestMapping("/all/attractions")
 @Tag(name = "관광지", description = "관광지 관련 API")
 public class AttractionController {
 
