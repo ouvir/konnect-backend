@@ -5,7 +5,6 @@ spring:
   config:
     import:
       - "classpath:application-secret.yml"
-      - optional:file:.env.dev[.properties]
 
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
