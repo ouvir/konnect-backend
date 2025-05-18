@@ -18,7 +18,7 @@ public class CreateDiaryRequestDTO {
     // TODO: 지역 코드는 변경될 예정
     private Long areaCode;
 
-    private List<String> tags;
+    private List<Long> tags;
 
     private Long writerId;
 
