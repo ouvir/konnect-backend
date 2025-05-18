@@ -1,7 +1,11 @@
 package com.konnect.service;
 
 import com.konnect.dto.CreateDiaryRequestDTO;
+import com.konnect.dto.CreateDiaryResponseDTO;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface DiaryService {
-    void createDiary(CreateDiaryRequestDTO requestDTO);
+    CreateDiaryResponseDTO createDiary(CreateDiaryRequestDTO requestDTO, List<MultipartFile> imageFiles);
 }
