@@ -25,6 +25,10 @@ spring:
 client:
   url: ${CLIENT_URL}
 
+oauth:
+  redirect:
+    whitelist: ${OAUTH_REDIRECT_WHITELIST}
+
 springdoc:
   swagger-ui:
     # "Try it out" 버튼을 GET 에서만 활성화
