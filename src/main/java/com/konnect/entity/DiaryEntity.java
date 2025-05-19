@@ -1,6 +1,7 @@
 package com.konnect.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -32,10 +33,12 @@ public class DiaryEntity {
     private Integer imageTotalCount;
 
     @Column(name = "start_date")
-    private LocalDate startDate;
+    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "날짜 형식은 yyyy-MM-dd 이어야 합니다.")
+    private String startDate;
 
     @Column(name = "end_date")
-    private LocalDate endDate;
+    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "날짜 형식은 yyyy-MM-dd 이어야 합니다.")
+    private String endDate;
 
     @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL)
     private List<DiaryTagEntity> tags = new ArrayList<>();
@@ -49,8 +52,8 @@ public class DiaryEntity {
             String title,
             String content,
             Integer imageTotalCount,
-            LocalDate startDate,
-            LocalDate endDate,
+            String startDate,
+            String endDate,
             List<DiaryTagEntity> tags
     ) {
         this.userId = userId;

@@ -19,8 +19,9 @@ public class CreateDiaryResponseDTO {
     private Long userId;
     private String title;
     private String content;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private Integer imageTotalCount;
+    private String startDate;
+    private String endDate;
     private List<TagResponseDTO> tags;
 
     public static CreateDiaryResponseDTO from(DiaryEntity diary) {
@@ -29,6 +30,7 @@ public class CreateDiaryResponseDTO {
                 diary.getUserId(),
                 diary.getTitle(),
                 diary.getContent(),
+                diary.getImageTotalCount(),
                 diary.getStartDate(),
                 diary.getEndDate(),
                 new ArrayList<>()
