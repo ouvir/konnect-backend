@@ -25,6 +25,4 @@ public class CreateDiaryRequestDTO {
     private LocalDate startDate;
 
     private LocalDate endDate;
-
-    private List<SelectedAttractionDTO> attractions;
 }
