@@ -10,7 +10,8 @@ import lombok.*;
 @AllArgsConstructor
 @Table(name = "diarytags")
 public class DiaryTagEntity {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -32,7 +32,7 @@ public class DiaryServiceImpl implements DiaryService {
     public CreateDiaryResponseDTO createDiary(CreateDiaryRequestDTO requestDTO, List<MultipartFile> imageFiles) {
         DiaryEntity diary = DiaryEntity.builder()
                 .userId(requestDTO.getWriterId())
-                .areaCode(requestDTO.getAreaCode())
+                .areaId(requestDTO.getAreaId())
                 .title(requestDTO.getTitle())
                 .content(requestDTO.getContent())
                 .imageTotalCount(imageFiles.size())

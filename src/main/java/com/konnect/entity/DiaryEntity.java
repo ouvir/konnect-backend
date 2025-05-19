@@ -18,23 +18,23 @@ public class DiaryEntity {
     @Column(name = "diary_id")
     private Long diaryId;
 
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name="area_code", nullable = false)
-    private Long areaCode;
+    @Column(name="area_id")
+    private Long areaId;
 
     private String title;
 
     private String content;
 
-    @Column(name = "image_total_count", nullable = false)
+    @Column(name = "image_total_count")
     private Integer imageTotalCount;
 
-    @Column(name = "start_date", nullable = false)
+    @Column(name = "start_date")
     private LocalDate startDate;
 
-    @Column(name = "end_date", nullable = false)
+    @Column(name = "end_date")
     private LocalDate endDate;
 
     @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL)
@@ -45,7 +45,7 @@ public class DiaryEntity {
     @Builder
     public DiaryEntity(
             Long userId,
-            Long areaCode,
+            Long areaId,
             String title,
             String content,
             Integer imageTotalCount,
@@ -54,7 +54,7 @@ public class DiaryEntity {
             List<DiaryTagEntity> tags
     ) {
         this.userId = userId;
-        this.areaCode = areaCode;
+        this.areaId = areaId;
         this.title = title;
         this.content = content;
         this.imageTotalCount = imageTotalCount;
