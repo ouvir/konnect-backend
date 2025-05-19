@@ -40,9 +40,7 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final AuthenticationConfiguration authenticationConfiguration;
-
-    @Value("${client.url}")
-    String clientUrl;
+    private final List<String> clientUrlList;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -60,8 +58,7 @@ public class SecurityConfig {
         http
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
                     CorsConfiguration configuration = new CorsConfiguration();
-
-                    configuration.setAllowedOrigins(Collections.singletonList(clientUrl));
+                    configuration.setAllowedOrigins(clientUrlList);
                     configuration.setAllowedMethods(Collections.singletonList("*"));
                     configuration.setAllowCredentials(true);
                     configuration.setAllowedHeaders(Collections.singletonList("*"));
@@ -72,7 +69,7 @@ public class SecurityConfig {
 
                     return configuration;
                 }));
-        
+
         // 인증 오류 핸들링 추가(JWT 만료)
         http
                 .exceptionHandling(ex -> ex
@@ -102,7 +99,6 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class);
 
         // state 관련 param 받아서
-
 
 
         //oauth2 -> oauth2 를 통해, 인증 진행 `/oauth2/authorization/{provider}`

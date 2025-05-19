@@ -1,20 +1,24 @@
 package com.konnect.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.List;
+
 @Configuration
+@RequiredArgsConstructor
 public class CorsMvcConfig implements WebMvcConfigurer {
 
-    @Value("${client.url}")
-    String clientUrl;
+    private final List<String> clientUrlList;
 
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
-        corsRegistry.addMapping("/**")
-                .exposedHeaders("Set-Cookie")
-                .allowedOrigins(clientUrl);
+        for (String clientUrl : clientUrlList) {
+            corsRegistry.addMapping("/**")
+                    .exposedHeaders("Set-Cookie")
+                    .allowedOrigins(clientUrl);
+        }
     }
 }

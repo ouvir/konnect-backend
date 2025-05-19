@@ -7,12 +7,12 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-public class OauthConfig {
+public class ClientConfig {
 
     @Bean
-    public List<String> redirectWhitelist(
-            @Value("${oauth.redirect.whitelist}") String whiteList
+    public List<String> clientUrlList(
+            @Value("${client.url}") String clientUrls
     ) {
-        return List.of(whiteList.split("\\s*,\\s*"));
+        return List.of(clientUrls.split("\\s*,\\s*"));
     }
 }
