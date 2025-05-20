@@ -55,7 +55,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     }
 
     private String getRedirectURL(HttpServletRequest request, HttpServletResponse response) {
-        String redirectUri = "";
+        String redirectUri = "http://localhost:8080";
 
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {

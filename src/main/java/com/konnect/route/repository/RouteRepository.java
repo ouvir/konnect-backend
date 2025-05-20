@@ -1,6 +1,5 @@
 package com.konnect.route.repository;
 
-import com.konnect.route.dto.RouteResponse;
 import com.konnect.route.entity.Route;
 import org.springframework.data.jpa.repository.JpaRepository;
 

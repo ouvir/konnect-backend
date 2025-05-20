@@ -1,8 +1,9 @@
 package com.konnect.route.controller;
 
 import com.konnect.auth.dto.CustomUserPrincipal;
+import com.konnect.route.dto.RouteCreateByDateRequest;
 import com.konnect.route.dto.RouteCreateRequest;
-import com.konnect.route.dto.RouteResponse;
+import com.konnect.route.dto.RouteDetailResponse;
 import com.konnect.route.dto.RouteUpdateRequest;
 import com.konnect.route.service.RouteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -27,6 +29,41 @@ import java.util.List;
 public class RouteController {
 
     private final RouteService routeService;
+
+    @Operation(
+            summary = "루트 생성(방문 날짜만 제공)",
+            description = """
+            • yyyy-MM-dd 형식의 <code>visitedDate</code> 를 받습니다.  
+            • 실제 저장 시 시간은 **23:59:59** 로 자동 세팅됩니다.
+            """
+    )
+    @PostMapping("/by-date")
+    public ResponseEntity<Long> createByDate(
+            @Valid @RequestBody RouteCreateByDateRequest req,
+            @AuthenticationPrincipal CustomUserPrincipal userDetails) {
+
+        return ResponseEntity.ok(
+                routeService.createByDate(req, userDetails.getId())
+        );
+    }
+
+
+    @Operation(
+            summary = "루트 목록 조회(방문 날짜별)",
+            description = """
+            • 다이어리 PK + 방문 날짜(yyyy-MM-dd)를 전달하면  
+              해당 날짜의 루트들을 **방문 시간 오름차순**(visitedAt ASC)으로 반환합니다.
+            """
+    )
+    @GetMapping("/by-date")
+    public ResponseEntity<List<RouteDetailResponse>> listByDate(
+            @RequestParam Long diaryId,
+            @RequestParam LocalDate visitedDate) {
+
+        return ResponseEntity.ok(
+                routeService.listByDiaryAndDate(diaryId, visitedDate)
+        );
+    }
 
     @Operation(
             summary = "루트 생성",
@@ -58,12 +95,12 @@ public class RouteController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공",
-                    content = @Content(schema = @Schema(implementation = RouteResponse.class))),
+                    content = @Content(schema = @Schema(implementation = RouteDetailResponse.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 diaryId",
                     content = @Content)
     })
     @GetMapping
-    public ResponseEntity<List<RouteResponse>> list(
+    public ResponseEntity<List<RouteDetailResponse>> list(
             @Parameter(description = "다이어리 PK", required = true, example = "3")
             @RequestParam Long diaryId) {
 

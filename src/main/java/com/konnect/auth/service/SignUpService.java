@@ -33,9 +33,8 @@ public class SignUpService {
         if (userRepository.existsByEmail(email)) {
             throw new SignUpRuntimeException(SignUpError.DUPLICATE_EMAIL);
         }
-
-        if (userRepository.existsByName(name)) {
-            throw new SignUpRuntimeException(SignUpError.DUPLICATE_USERNAME);
-        }
+//        if (userRepository.existsByName(name)) {
+//            throw new SignUpRuntimeException(SignUpError.DUPLICATE_USERNAME);
+//        }
     }
 }
