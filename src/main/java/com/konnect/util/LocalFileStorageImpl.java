@@ -1,6 +1,6 @@
 package com.konnect.util;
 
-import com.konnect.service.exception.FileStorageRuntimeException;
+import com.konnect.diary.service.exception.FileStorageRuntimeException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,9 +1,9 @@
 package com.konnect.signup;
 
-import com.konnect.dto.SignUpDTO;
-import com.konnect.entity.UserEntity;
-import com.konnect.repository.UserRepository;
-import com.konnect.service.SignUpService;
+import com.konnect.auth.dto.SignUpDTO;
+import com.konnect.user.entity.UserEntity;
+import com.konnect.user.repository.UserRepository;
+import com.konnect.auth.service.SignUpService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
 @Transactional

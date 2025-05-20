@@ -1,18 +1,16 @@
 package com.konnect.config;
 
 
-import com.konnect.security.jwt.LoginFilter;
+import com.konnect.auth.jwt.LoginFilter;
 import lombok.RequiredArgsConstructor;
-import com.konnect.security.jwt.CustomAuthenticationEntryPoint;
-import com.konnect.security.jwt.JWTFilter;
-import com.konnect.security.jwt.JWTUtil;
-import com.konnect.security.oauth2.CustomSuccessHandler;
-import com.konnect.service.CustomOAuth2UserService;
-import org.springframework.beans.factory.annotation.Value;
+import com.konnect.auth.jwt.CustomAuthenticationEntryPoint;
+import com.konnect.auth.jwt.JWTFilter;
+import com.konnect.auth.jwt.JWTUtil;
+import com.konnect.auth.oauth2.CustomSuccessHandler;
+import com.konnect.auth.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

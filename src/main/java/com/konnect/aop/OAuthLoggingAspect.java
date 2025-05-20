@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 public class OAuthLoggingAspect {
     // CustomOAuth2UserService: loadUser method
-    @Pointcut("execution(* com.konnect.service.CustomOAuth2UserService.loadUser(..))")
+    @Pointcut("execution(* com.konnect.auth.service.CustomOAuth2UserService.loadUser(..))")
     public void loadUserPointcut() {}
 
     @Before("loadUserPointcut()")
