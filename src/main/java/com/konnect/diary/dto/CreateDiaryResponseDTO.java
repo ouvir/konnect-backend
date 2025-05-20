@@ -24,9 +24,10 @@ public class CreateDiaryResponseDTO {
     private String endDate;
     private List<TagResponseDTO> tags;
 
-    private List<String> imageCodes;
+    private String thumbnailImage;
+    private List<String> images;
 
-    public static CreateDiaryResponseDTO from(DiaryEntity diary, List<String> imageCodes) {
+    public static CreateDiaryResponseDTO from(DiaryEntity diary, String thumbnailImage, List<String> images) {
         List<TagResponseDTO> tagResponses = new ArrayList<>();
         for (DiaryTagEntity diaryTag : diary.getTags()) {
             tagResponses.add(TagResponseDTO.from(diaryTag.getTag()));
@@ -40,7 +41,8 @@ public class CreateDiaryResponseDTO {
                 diary.getStartDate(),
                 diary.getEndDate(),
                 tagResponses,
-                imageCodes
+                thumbnailImage,
+                images
         );
     }
 }
