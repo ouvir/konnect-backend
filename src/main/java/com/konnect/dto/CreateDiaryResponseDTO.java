@@ -1,12 +1,13 @@
 package com.konnect.dto;
 
 import com.konnect.entity.DiaryEntity;
+import com.konnect.entity.DiaryTagEntity;
+import com.konnect.entity.TagEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,21 +20,27 @@ public class CreateDiaryResponseDTO {
     private Long userId;
     private String title;
     private String content;
-    private Integer imageTotalCount;
     private String startDate;
     private String endDate;
     private List<TagResponseDTO> tags;
 
-    public static CreateDiaryResponseDTO from(DiaryEntity diary) {
+    private List<String> imageCodes;
+
+    public static CreateDiaryResponseDTO from(DiaryEntity diary, List<String> imageCodes) {
+        List<TagResponseDTO> tagResponses = new ArrayList<>();
+        for (DiaryTagEntity diaryTag : diary.getTags()) {
+            tagResponses.add(TagResponseDTO.from(diaryTag.getTag()));
+        }
+
         return new CreateDiaryResponseDTO(
                 diary.getDiaryId(),
-                diary.getUserId(),
+                diary.getUser().getUserId(),
                 diary.getTitle(),
                 diary.getContent(),
-                diary.getImageTotalCount(),
                 diary.getStartDate(),
                 diary.getEndDate(),
-                new ArrayList<>()
+                tagResponses,
+                imageCodes
         );
     }
 }

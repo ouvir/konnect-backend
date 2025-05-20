@@ -1,30 +1,38 @@
 package com.konnect.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
+@NoArgsConstructor()
 @AllArgsConstructor
+@Builder
+@ToString
 public class CreateDiaryRequestDTO {
+    @NotBlank
     private String title;
 
-    private String content;
+    @NotBlank
+    private Long userId;
 
-    private Long areaId;
+    @NotBlank
+    private String status;
 
-    private List<Long> tags;
+    private Optional<String> content = Optional.empty();
 
-    private Long writerId;
+    private Optional<Long> areaId = Optional.empty();
+
+    private List<Long> tags = new ArrayList<>();
 
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "날짜 형식은 yyyy-MM-dd 이어야 합니다.")
-    private String startDate;
+    private Optional<String> startDate = Optional.empty();
 
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "날짜 형식은 yyyy-MM-dd 이어야 합니다.")
-    private String endDate;
+    private Optional<String> endDate = Optional.empty();
 }

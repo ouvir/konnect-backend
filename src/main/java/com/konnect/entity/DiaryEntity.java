@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "diaries")
 public class DiaryEntity {
@@ -19,11 +19,13 @@ public class DiaryEntity {
     @Column(name = "diary_id")
     private Long diaryId;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
-    @Column(name="area_id")
-    private Long areaId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="area_id")
+    private AreaEntity area;
 
     private String title;
 
@@ -33,36 +35,38 @@ public class DiaryEntity {
     private Integer imageTotalCount;
 
     @Column(name = "start_date")
-    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "날짜 형식은 yyyy-MM-dd 이어야 합니다.")
     private String startDate;
 
     @Column(name = "end_date")
-    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "날짜 형식은 yyyy-MM-dd 이어야 합니다.")
     private String endDate;
 
     @OneToMany(mappedBy = "diary", cascade = CascadeType.ALL)
     private List<DiaryTagEntity> tags = new ArrayList<>();
 
+    private String status;
+
     // TODO: 여행 루트 컬럼 추가 예정
 
     @Builder
     public DiaryEntity(
-            Long userId,
-            Long areaId,
+            UserEntity user,
+            AreaEntity area,
             String title,
             String content,
             Integer imageTotalCount,
             String startDate,
             String endDate,
-            List<DiaryTagEntity> tags
+            List<DiaryTagEntity> tags,
+            String status
     ) {
-        this.userId = userId;
-        this.areaId = areaId;
+        this.user = user;
+        this.area = area;
         this.title = title;
         this.content = content;
         this.imageTotalCount = imageTotalCount;
         this.startDate = startDate;
         this.endDate = endDate;
         this.tags = tags;
+        this.status = status;
     }
 }
