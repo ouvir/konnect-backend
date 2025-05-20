@@ -70,7 +70,6 @@ public class AttractionController {
             @PathVariable("attractionId") Integer attractionId
     ) {
         AttractionDTO attraction = attractionService.getAttractionDetail(attractionId);
-        System.out.println(attraction);
         return ResponseEntity.ok(attraction);
     }
 }

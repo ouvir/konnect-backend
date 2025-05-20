@@ -21,7 +21,6 @@ public class CustomUserDetailService implements UserDetailsService {
         UserEntity user = userRepository.findByEmail(email);
 
         if (user == null) {
-            System.out.println("userNull");
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email);
         }
 
