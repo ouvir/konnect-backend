@@ -1,22 +1,58 @@
 package com.konnect.controller;
 
+import com.konnect.dto.SignUpDTO;
+import com.konnect.security.jwt.JWTUtil;
+import com.konnect.service.SignUpService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
-@Profile("dev")
-@Tag(name = "인증", description = "인증 관련 API(로그인, 회원가입)")
-public class AuthMockController {
+@RequiredArgsConstructor
+@Tag(name = "인증", description = "인증 관련 API(로그인, 로그아웃, 회원가입)")
+public class AuthController {
 
-    @PostMapping("/login")
+    private final JWTUtil jwtUtil;
+    private final SignUpService signUpService;
+
+    @Operation(
+            tags = {"인증"},
+            summary = "로그아웃",
+            description = "Authorization 쿠키를 삭제하여 로그아웃"
+    )
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        Cookie deleteCookie = jwtUtil.deleteCookie("Authorization", null);
+        response.addCookie(deleteCookie);
+
+        return ResponseEntity.ok("로그아웃 성공");
+    }
+
+    @Operation(summary = "회원가입", tags = {"인증"})
+    @PostMapping("/signup")
+    public ResponseEntity<String> signUp(@RequestBody SignUpDTO joinDTO) {
+        try {
+            signUpService.signUp(joinDTO);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
+    }
+
+
+    // ------------------------------------- Swagger 문서용 controller -------------------------------------
     @Operation(
             summary = "일반 로그인 요청",
             description = "이메일과 비밀번호로 로그인하여, JWT 쿠키를 발급받습니다.",
@@ -49,6 +85,8 @@ public class AuthMockController {
                     )
             }
     )
+    @Profile("dev")
+    @PostMapping("/login")
     public void login(@RequestBody LoginRequest request) {
         // Swagger에서 테스트 가능하게 Dummy 컨트롤러 구현 (실제 처리는 Filter)
     }
@@ -59,6 +97,7 @@ public class AuthMockController {
                     경로로 redirect 요청시, 소셜 로그인 인증이 시작되며 인증 성공 시 JWT 쿠키가 발급됩니다.
                     """
     )
+    @Profile("dev")
     @GetMapping("/oauth2/authorization/{provider}")
     public void oauthLogin(@PathVariable @Schema(description = "provider", example = "naver") String provider) {
         // Swagger 문서화용 Dummy endpoint

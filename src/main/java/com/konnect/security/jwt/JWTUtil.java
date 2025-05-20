@@ -56,4 +56,13 @@ public class JWTUtil {
         //cookie.setHttpOnly(true); //js가 cookie 못가져가도록 설정
         return cookie;
     }
+
+    public Cookie deleteCookie(String key, String value) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(0);
+        //cookie.setSecure(true); //https만 가능하게 설정
+        cookie.setPath("/");
+        //cookie.setHttpOnly(true); //js가 cookie 못가져가도록 설정
+        return cookie;
+    }
 }

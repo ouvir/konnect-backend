@@ -8,7 +8,6 @@ import com.konnect.security.jwt.JWTFilter;
 import com.konnect.security.jwt.JWTUtil;
 import com.konnect.security.oauth2.CustomSuccessHandler;
 import com.konnect.service.CustomOAuth2UserService;
-import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +20,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -85,6 +83,10 @@ public class SecurityConfig {
         //Form 로그인 방식 disable
         http
                 .formLogin(AbstractHttpConfigurer::disable);
+
+        // 기본 로그아웃 방식 disable
+        http
+                .logout(AbstractHttpConfigurer::disable);
 
         //HTTP Basic 인증 방식 disable
         http
