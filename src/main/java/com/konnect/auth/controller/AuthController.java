@@ -86,8 +86,9 @@ public class AuthController {
     )
     @Profile("dev")
     @PostMapping("api/v1/all/auth/login")
-    public void login(@RequestBody LoginRequest request) {
+    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
         // Swagger에서 테스트 가능하게 Dummy 컨트롤러 구현 (실제 처리는 Filter)
+        return ResponseEntity.ok("로그인 성공");
     }
 
     @Operation(
@@ -104,7 +105,7 @@ public class AuthController {
 
     @Data
     @Schema(description = "일반 로그인 요청 데이터")
-    class LoginRequest {
+    static class LoginRequest {
 
         @Schema(description = "이메일", example = "user@example.com", required = true)
         private String email;

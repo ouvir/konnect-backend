@@ -31,9 +31,9 @@ public class DiaryEntity {
     private String title;
 
     private String content;
-
-    @Column(name = "image_total_count")
-    private Integer imageTotalCount;
+//TODO
+//    @Column(name = "image_total_count")
+//    private Integer imageTotalCount;
 
     @Column(name = "start_date")
     private String startDate;
@@ -54,7 +54,7 @@ public class DiaryEntity {
             AreaEntity area,
             String title,
             String content,
-            Integer imageTotalCount,
+//            Integer imageTotalCount,
             String startDate,
             String endDate,
             List<DiaryTagEntity> tags,
@@ -64,7 +64,7 @@ public class DiaryEntity {
         this.area = area;
         this.title = title;
         this.content = content;
-        this.imageTotalCount = imageTotalCount;
+//        this.imageTotalCount = imageTotalCount;
         this.startDate = startDate;
         this.endDate = endDate;
         this.tags = tags;
