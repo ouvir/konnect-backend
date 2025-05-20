@@ -10,6 +10,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class AttractionRepositoryImpl implements AttractionRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
+    @Transactional(readOnly = true)
     public OffsetPage<AttractionDTO> searchWithCondition(int page, int size, SearchCondition condition) {
         QAttraction attraction = QAttraction.attraction;
         BooleanBuilder where = new BooleanBuilder();
@@ -77,6 +79,7 @@ public class AttractionRepositoryImpl implements AttractionRepositoryCustom {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AttractionDTO findByNo(Integer no) {
         QAttraction attraction = QAttraction.attraction;
         QContentType contentType = QContentType.contentType;
