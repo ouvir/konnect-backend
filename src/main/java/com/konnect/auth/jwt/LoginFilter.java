@@ -18,10 +18,18 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-@RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
+
+    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
+        super.setAuthenticationManager(authenticationManager);
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+
+        // 로그인 URL 변경
+        setFilterProcessesUrl("/api/v1/auth/login");
+    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
