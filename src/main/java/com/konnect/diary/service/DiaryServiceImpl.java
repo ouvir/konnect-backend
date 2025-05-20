@@ -6,7 +6,7 @@ import com.konnect.diary.repository.DiaryRepository;
 import com.konnect.diary.repository.DiaryTagRepository;
 import com.konnect.diary.dto.CreateDiaryRequestDTO;
 import com.konnect.diary.dto.CreateDiaryResponseDTO;
-import com.konnect.dto.ListDiaryResponseDTO;
+//import com.konnect.dto.ListDiaryResponseDTO;
 import com.konnect.repository.*;
 import com.konnect.user.repository.UserRepository;
 import com.konnect.util.ImageManager;
@@ -87,9 +87,9 @@ public class DiaryServiceImpl implements DiaryService {
                 && dto.getTags().size() == 3;
     }
 
-    @Override
-    public List<ListDiaryResponseDTO> fetchDiaryList() {
-
-        return null;
-    }
+//    @Override
+//    public List<ListDiaryResponseDTO> fetchDiaryList() {
+//
+//        return null;
+//    }
 }

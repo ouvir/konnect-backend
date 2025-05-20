@@ -31,7 +31,7 @@ public class AuthController {
             summary = "로그아웃",
             description = "Authorization 쿠키를 삭제하여 로그아웃"
     )
-    @PostMapping("/logout")
+    @PostMapping("api/v1/user/auth/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
         Cookie deleteCookie = jwtUtil.deleteCookie("Authorization", null);
         response.addCookie(deleteCookie);
@@ -40,7 +40,7 @@ public class AuthController {
     }
 
     @Operation(summary = "회원가입", tags = {"인증"})
-    @PostMapping("/signup")
+    @PostMapping("api/v1/all/auth/signup")
     public ResponseEntity<String> signUp(@RequestBody SignUpDTO joinDTO) {
         try {
             signUpService.signUp(joinDTO);
@@ -85,7 +85,7 @@ public class AuthController {
             }
     )
     @Profile("dev")
-    @PostMapping("/login")
+    @PostMapping("api/v1/all/auth/login")
     public void login(@RequestBody LoginRequest request) {
         // Swagger에서 테스트 가능하게 Dummy 컨트롤러 구현 (실제 처리는 Filter)
     }
