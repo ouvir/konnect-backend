@@ -40,3 +40,7 @@ gradle/
 /src/main/resources/application-secret.yml
 .env
 .env.*
+
+
+# ───────────────────────── Query DSL ─────────────────────
+/src/main/generated/

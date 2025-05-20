@@ -114,18 +114,16 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> {
                     // 공통 허용 경로
-                    auth.requestMatchers("/", "/login", "/signup").permitAll();
+                    auth.requestMatchers("/", "/login", "/signup", "/api/v1/all/**").permitAll();
 
                     // dev 환경일 때, Swagger 경로 허용
-                    if (env.acceptsProfiles(Profiles.of("dev"))) {
-                        auth.requestMatchers(
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-resources/**",
-                                "/webjars/**"
-                        ).permitAll();
-                    }
+                    auth.requestMatchers(
+                            "/swagger-ui.html",
+                            "/swagger-ui/**",
+                            "/v3/api-docs/**",
+                            "/swagger-resources/**",
+                            "/webjars/**"
+                    ).permitAll();
 
                     // 나머지는 인증 필요
                     auth.anyRequest().authenticated();
