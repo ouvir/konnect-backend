@@ -2,6 +2,11 @@ spring:
   application:
     name: Konnect
 
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 30MB
+
   config:
     import:
       - "classpath:application-secret.yml"
@@ -35,3 +40,7 @@ springdoc:
     operations-sorter : method
     # 접힌 상태로 시작
     doc-expansion : none
+
+storage:
+  image:
+    path: ${STORAGE_IMAGE_DIRECTORY_PATH}
