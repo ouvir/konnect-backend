@@ -3,6 +3,7 @@ package com.konnect.attraction.repository;
 import com.konnect.attraction.dto.AttractionDTO;
 import com.konnect.attraction.entity.*;
 import com.konnect.util.CursorPage;
+import com.konnect.util.OffsetPage;
 import com.konnect.util.SearchCondition;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
@@ -19,23 +20,13 @@ public class AttractionRepositoryImpl implements AttractionRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public CursorPage<AttractionDTO> searchWithCondition(CursorPage<?> page, SearchCondition condition) {
+    public OffsetPage<AttractionDTO> searchWithCondition(int page, int size, SearchCondition condition) {
         QAttraction attraction = QAttraction.attraction;
-        QContentType contentType = QContentType.contentType;
-        QSido sido = QSido.sido;
-        QGugun gugun = QGugun.gugun;
-
         BooleanBuilder where = new BooleanBuilder();
 
-        Long cursorId = page.getCursorIdOrDefault();
-        where.and(attraction.no.lt(cursorId == Long.MAX_VALUE ? Integer.MAX_VALUE : cursorId));
-
-        // Search 조건: title
         if (condition.has("title")) {
             where.and(attraction.title.containsIgnoreCase(condition.get("title")));
         }
-
-        // Search 조건: contentTypeId or contentTypeName
         if (condition.has("contentTypeId")) {
             try {
                 Integer contentTypeId = Integer.parseInt(condition.get("contentTypeId"));
@@ -43,7 +34,12 @@ public class AttractionRepositoryImpl implements AttractionRepositoryCustom {
             } catch (NumberFormatException ignored) {}
         }
 
-        // 조회 + 조인 + DTO 매핑
+        long total = queryFactory
+                .select(attraction.count())
+                .from(attraction)
+                .where(where)
+                .fetchOne();
+
         List<AttractionDTO> results = queryFactory
                 .select(Projections.fields(
                         AttractionDTO.class,
@@ -68,17 +64,16 @@ public class AttractionRepositoryImpl implements AttractionRepositoryCustom {
                         attraction.overview
                 ))
                 .from(attraction)
-                .leftJoin(attraction.contentType, contentType)
-                .leftJoin(attraction.sido, sido)
-                .join(attraction.gugun, gugun)
-//                .on(gugun.sido.sidoCode.eq(attraction.sido.sidoCode)
-//                    .and(gugun.gugunCode.eq(attraction.gugun.gugunCode)))
+                .leftJoin(attraction.contentType, QContentType.contentType)
+                .leftJoin(attraction.sido, QSido.sido)
+                .join(attraction.gugun, QGugun.gugun)
                 .where(where)
                 .orderBy(attraction.no.desc())
-                .limit(page.getSize() + 1)
+                .offset((long) page * size)
+                .limit(size)
                 .fetch();
 
-        return CursorPage.of(results, page.getSize());
+        return OffsetPage.of(results, page, size, (int) total);
     }
 
     @Override

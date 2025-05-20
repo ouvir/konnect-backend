@@ -3,6 +3,7 @@ package com.konnect.attraction.controller;
 import com.konnect.attraction.dto.AttractionDTO;
 import com.konnect.attraction.service.AttractionService;
 import com.konnect.util.CursorPage;
+import com.konnect.util.OffsetPage;
 import com.konnect.util.SearchCondition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,6 +11,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,36 +25,38 @@ public class AttractionController {
     @Operation(
             summary = "관광지 목록 조회",
             description = """
-                        관광지 목록 조회(커서 기반 페이지네이션과 검색 조건 활용)
-                        - 커서 기반 페이징: 마지막 contentId를 cursorId로 전달  
-                        - 검색 조건: 제목(title), 콘텐츠 타입 ID(contentTypeId), 콘텐츠 타입 이름(contentTypeName)
-                    """
+            관광지 목록을 페이지 단위로 조회합니다 (Offset 기반 페이징).
+            
+            - `page`: 0부터 시작하는 페이지 번호 (기본값: 0)
+            - `size`: 한 페이지에 포함할 데이터 개수 (기본값: 10)
+            - `title`: 관광지 제목 키워드 (부분 일치 검색)
+            - `contentTypeId`: 콘텐츠 유형 ID (예: 12는 관광지)
+            - `contentTypeName`: 콘텐츠 유형 이름 (예: 관광지, 문화시설 등)
+        """
     )
     @GetMapping
-    public ResponseEntity<CursorPage<AttractionDTO>> getAttractions(
-            @Parameter(description = "이전 페이지의 마지막 contentId (기본: 없음)")
-            @RequestParam(required = false) Long cursorId,
+    public ResponseEntity<OffsetPage<AttractionDTO>> getAttractions(
+            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
 
-            @Parameter(description = "페이지 크기 (기본값: 10)")
+            @Parameter(description = "한 페이지 당 항목 수", example = "10")
             @RequestParam(defaultValue = "10") int size,
 
-            @Parameter(description = "제목 검색어 (부분 일치)")
+            @Parameter(description = "관광지 제목 키워드", example = "서울")
             @RequestParam(required = false) String title,
 
-            @Parameter(description = "콘텐츠 타입 ID (예: 12)")
+            @Parameter(description = "콘텐츠 타입 ID", example = "")
             @RequestParam(required = false) String contentTypeId,
 
-            @Parameter(description = "콘텐츠 타입 이름 (예: 관광지, 문화시설 등)")
+            @Parameter(description = "콘텐츠 타입 이름", example = "관광지")
             @RequestParam(required = false) String contentTypeName
     ) {
         SearchCondition condition = new SearchCondition();
-        if (title != null) condition.put("title", title);
-        if (contentTypeId != null) condition.put("contentTypeId", contentTypeId);
-        if (contentTypeName != null) condition.put("contentTypeName", contentTypeName);
+        condition.put("title", title);
+        condition.put("contentTypeId", contentTypeId);
+        condition.put("contentTypeName", contentTypeName);
 
-        CursorPage<AttractionDTO> result =
-                attractionService.searchAttractions(cursorId, size, condition);
-
+        OffsetPage<AttractionDTO> result = attractionService.searchAttractions(page, size, condition);
         return ResponseEntity.ok(result);
     }
 
