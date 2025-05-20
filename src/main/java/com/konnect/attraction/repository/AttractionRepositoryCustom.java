@@ -6,4 +6,5 @@ import com.konnect.util.SearchCondition;
 
 public interface AttractionRepositoryCustom {
     CursorPage<AttractionDTO> searchWithCondition(CursorPage<?> page, SearchCondition condition);
+    AttractionDTO findByNo(Integer no);
 }

@@ -6,4 +6,5 @@ import com.konnect.util.SearchCondition;
 
 public interface AttractionService {
     CursorPage<AttractionDTO> searchAttractions(Long cursorId, int size, SearchCondition condition);
+    AttractionDTO getAttractionDetail(Integer id);
 }

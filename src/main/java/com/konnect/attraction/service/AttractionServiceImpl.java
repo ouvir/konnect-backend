@@ -21,4 +21,9 @@ public class AttractionServiceImpl implements AttractionService {
         CursorPage<?> page = new CursorPage<>(cursorId, size);
         return attractionRepository.searchWithCondition(page, condition);
     }
+
+    @Override
+    public AttractionDTO getAttractionDetail(Integer id) {
+        return attractionRepository.findByNo(id);
+    }
 }

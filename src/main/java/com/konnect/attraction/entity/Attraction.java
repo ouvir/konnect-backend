@@ -32,7 +32,10 @@ public class Attraction {
     private Sido sido;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "si_gun_gu_code", referencedColumnName = "gugun_code")
+    @JoinColumns({
+            @JoinColumn(name = "area_code",     referencedColumnName = "sido_code",  insertable = false, updatable = false),
+            @JoinColumn(name = "si_gun_gu_code", referencedColumnName = "gugun_code", insertable = false, updatable = false)
+    })
     private Gugun gugun;
 
     @Column(name = "first_image1", length = 100)
