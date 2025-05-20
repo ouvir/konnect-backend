@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -82,6 +83,42 @@ public class DiaryController {
         requestDTO.setUserId(userDetails.getId());
         CreateDiaryResponseDTO dto =
                 diaryService.createDiaryDraft(requestDTO, thumbnail, imageFiles);
+        HttpStatus status = dto.getDiaryId() == null ? HttpStatus.CREATED : HttpStatus.OK;
+        return ResponseEntity.status(status).body(dto);
+    }
+
+    @PostMapping("/user/diaries/{diaryId}/publish")
+    @ResponseBody
+    public ResponseEntity<CreateDiaryResponseDTO> publishDiary(
+            @PathVariable Long diaryId,
+
+            @Parameter(
+                    description = "다이어리 게시 요청 DTO",
+                    required = true,
+                    schema = @Schema(implementation = CreateDiaryDraftRequestDTO.class)
+            )
+            @RequestPart("data") CreateDiaryDraftRequestDTO requestDTO,
+
+            @Parameter(
+                    description = "썸네일 이미지 파일 (optional)",
+                    in = ParameterIn.HEADER,
+                    content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+            )
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail,
+
+            @Parameter(
+                    description = "본문 이미지 파일 목록, 최대 9장 (optional)",
+                    in = ParameterIn.HEADER,
+                    content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+            )
+            @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
+
+            @AuthenticationPrincipal CustomUserPrincipal userDetails
+    ) {
+        requestDTO.setUserId(userDetails.getId());
+        requestDTO.setDiaryId(Optional.ofNullable(diaryId));
+        CreateDiaryResponseDTO dto =
+                diaryService.publishDraft(requestDTO, thumbnail, imageFiles);
         HttpStatus status = dto.getDiaryId() == null ? HttpStatus.CREATED : HttpStatus.OK;
         return ResponseEntity.status(status).body(dto);
     }
