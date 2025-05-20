@@ -107,6 +107,7 @@ Swagger 테스트 시 쿠키에 Authorization 토큰이 필요합니다.
 
 ```
 # 주입 방법
+dos2unix .env
 set -a
 source .env
 set +a 
