@@ -13,4 +13,9 @@ public interface DiaryService {
             MultipartFile thumbnail,
             List<MultipartFile> imageFiles
     );
+    CreateDiaryResponseDTO publishDraft(
+            CreateDiaryDraftRequestDTO dto,
+            MultipartFile thumbnail,
+            List<MultipartFile> imageFiles
+    );
 }
