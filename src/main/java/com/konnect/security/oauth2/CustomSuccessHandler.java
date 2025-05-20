@@ -7,24 +7,26 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import com.konnect.security.jwt.JWTUtil;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JWTUtil jwtUtil;
+    private final List<String> clientUrlList;
 
-    @Value("${client.url}")
-    private String clientUrl;
+    private static final String REDIRECT_COOKIE = "OAUTH2_REDIRECT_URI";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -44,10 +46,33 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String token = jwtUtil.createJwt(userId, role);
 
-        // Cookie에 담아 전달
+        // JWT Cookie에 담아 전달
         response.addCookie(jwtUtil.createCookie("Authorization", token));
-        response.sendRedirect(clientUrl); // 클라이언트 url TODO oauth 성공 시, 특정 url로 이동
+
+        // redirect_uri 쿠키에서 값 얻기
+        String redirectUri = getRedirectURL(request, response);
+        response.sendRedirect(redirectUri);
     }
 
+    private String getRedirectURL(HttpServletRequest request, HttpServletResponse response) {
+        String redirectUri = "";
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (REDIRECT_COOKIE.equals(cookie.getName())) {
+                    redirectUri = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
+                    // 화이트리스트 검증
+                    if (clientUrlList.stream().noneMatch(redirectUri::startsWith)) {
+                        redirectUri = "http://localhost:8080/error";
+                    }
+                    cookie.setPath("/");
+                    cookie.setMaxAge(0);
+                    response.addCookie(cookie);
+                    break;
+                }
+            }
+        }
+        return redirectUri;
+    }
 
 }
