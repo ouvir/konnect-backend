@@ -1,13 +1,15 @@
 package com.konnect.diary.service;
 
+import com.konnect.diary.dto.CreateDiaryDraftRequestDTO;
+import com.konnect.diary.dto.CreateDiaryResponseDTO;
 import com.konnect.diary.entity.DiaryEntity;
 import com.konnect.diary.entity.DiaryTagEntity;
 import com.konnect.diary.repository.DiaryRepository;
 import com.konnect.diary.repository.DiaryTagRepository;
-import com.konnect.diary.dto.CreateDiaryRequestDTO;
-import com.konnect.diary.dto.CreateDiaryResponseDTO;
-//import com.konnect.dto.ListDiaryResponseDTO;
-import com.konnect.repository.*;
+import com.konnect.diary.service.exception.DiaryRuntimeException;
+import com.konnect.entity.TagEntity;
+import com.konnect.repository.AreaRepository;
+import com.konnect.repository.TagRepository;
 import com.konnect.user.repository.UserRepository;
 import com.konnect.util.ImageManager;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,68 +30,108 @@ public class DiaryServiceImpl implements DiaryService {
     private final DiaryRepository diaryRepository;
     private final DiaryTagRepository diaryTagRepository;
     private final TagRepository tagRepository;
-    private final UserRepository userRepository;
     private final AreaRepository areaRepository;
+    private final UserRepository userRepository;
 
     private final ImageManager imageManager;
 
     @Override
     @Transactional
-    public CreateDiaryResponseDTO createDiary(CreateDiaryRequestDTO requestDTO, List<MultipartFile> imageFiles) {
-        if (!validCreateRequestByStatus(requestDTO)) {
-            throw new IllegalArgumentException("status가 COMPLETE인 경우 필수 필드가 누락되었습니다.");
-        }
+    public CreateDiaryResponseDTO createDiaryDraft(
+            CreateDiaryDraftRequestDTO requestDTO,
+            MultipartFile thumbnail,
+            List<MultipartFile> imageFiles
+    ) {
+        DiaryEntity diary = requestDTO.getDiaryId()
+                .map(id -> diaryRepository.findById(id)
+                        .filter(d -> "editing".equals(d.getStatus()))
+                        .orElseThrow(() -> new DiaryRuntimeException("Draft not found for id: " + id))
+                )
+                .orElseGet(DiaryEntity::new);
 
-        DiaryEntity diary = DiaryEntity.builder()
-                .title(requestDTO.getTitle())
-                .user(userRepository.getReferenceById(requestDTO.getUserId()))
-                .status(requestDTO.getStatus())
-                .content(requestDTO.getContent().orElseThrow())
-                .area(areaRepository.getReferenceById(requestDTO.getAreaId().orElseThrow()))
-                .startDate(requestDTO.getStartDate().orElseThrow())
-                .endDate(requestDTO.getEndDate().orElseThrow())
-                .build();
-        DiaryEntity savedDiary = diaryRepository.save(diary);
+        try {
+            diary.setTitle(requestDTO.getTitle());
+            diary.setContent(requestDTO.getContent().orElse(null));
+            diary.setArea(requestDTO.getAreaId()
+                    .map(areaRepository::getReferenceById)
+                    .orElse(null)
+            );
+            diary.setStartDate(requestDTO.getStartDate().orElse(null));
+            diary.setEndDate(requestDTO.getEndDate().orElse(null));
+            diary.setStatus("editing");
+            Long userId = requestDTO.getUserId();
+            diary.setUser(userRepository.getReferenceById(userId));
 
-        List<DiaryTagEntity> tags = new ArrayList<>();
-        for (Long tagId: requestDTO.getTags()) {
-            DiaryTagEntity diaryTag = new DiaryTagEntity();
-            diaryTag.setDiary(diary);
-            diaryTag.setTag(tagRepository.getReferenceById(tagId));
-            tags.add(diaryTagRepository.save(diaryTag));
-        }
-        diary.setTags(tags);
+            diary = diaryRepository.save(diary);
+            syncTags(diary, requestDTO.getTags());
 
-        imageManager.saveImages(savedDiary.getDiaryId(), imageFiles);
-        List<String> base64Images = new ArrayList<>();
-        for (MultipartFile file : imageFiles) {
-            try {
-                byte[] bytes = file.getBytes();
-                String b64 = Base64.getEncoder().encodeToString(bytes);
-                base64Images.add(b64);
-            } catch (IOException e) {
-                throw new UncheckedIOException("이미지 변환에 실패했습니다: " + file.getOriginalFilename(), e);
+            byte[] thumbBytes = null;
+            if (thumbnail != null && !thumbnail.isEmpty()) {
+                try {
+                    thumbBytes = thumbnail.getBytes();
+                } catch (IOException e) {
+                    throw new DiaryRuntimeException("Failed to read thumbnail bytes");
+                }
             }
-        }
 
-        return CreateDiaryResponseDTO.from(diary, base64Images);
+            List<byte[]> imagesBytes = new ArrayList<>();
+            if (imageFiles != null) {
+                for (int i = 0; i < Math.min(imageFiles.size(), 9); i++) {
+                    MultipartFile mf = imageFiles.get(i);
+                    if (mf.isEmpty()) continue;
+                    try {
+                        imagesBytes.add(mf.getBytes());
+                    } catch (IOException e) {
+                        throw new DiaryRuntimeException("Failed to read image bytes");
+                    }
+                }
+            }
+
+            try {
+                imageManager.saveAllImages(diary.getDiaryId(), thumbnail, imageFiles);
+            } catch (Exception ex) {
+                throw new DiaryRuntimeException(
+                        "Failed to store images for diary " + diary.getDiaryId());
+            }
+
+            String thumbnailBase64 = null;
+            if (thumbBytes != null) {
+                String prefix = "data:" + thumbnail.getContentType() + ";base64,";
+                thumbnailBase64 = prefix + Base64.getEncoder()
+                        .encodeToString(thumbBytes);
+            }
+            List<String> imagesBase64 = imagesBytes.stream()
+                    .map(bytes -> "data:image/*;base64," +
+                            Base64.getEncoder().encodeToString(bytes))
+                    .collect(Collectors.toList());
+
+            return CreateDiaryResponseDTO.from(diary, thumbnailBase64, imagesBase64);
+        } catch (Exception ex) {
+            throw new DiaryRuntimeException(
+                    "Failed to create or update diary draft: " + ex.getMessage()
+            );
+        }
     }
 
-    private boolean validCreateRequestByStatus(CreateDiaryRequestDTO dto) {
-        if (dto.getStatus().equals("editing")) {
-            return true;
-        }
+    private void syncTags(DiaryEntity diary, List<Long> tagIds) {
+        try {
+            diaryTagRepository.deleteByDiary(diary);
+            diary.getTags().clear();
 
-        return dto.getContent().isPresent()
-                && dto.getAreaId().isPresent()
-                && dto.getStartDate().isPresent()
-                && dto.getEndDate().isPresent()
-                && dto.getTags().size() == 3;
+            tagIds.stream()
+                    .limit(3)
+                    .forEach(tagId -> {
+                        TagEntity tag = tagRepository.getReferenceById(tagId);
+                        DiaryTagEntity dt = new DiaryTagEntity();
+                        dt.setDiary(diary);
+                        dt.setTag(tag);
+                        diaryTagRepository.save(dt);
+                        diary.getTags().add(dt);
+                    });
+        } catch (Exception ex) {
+            System.out.println("DiaryServiceImpl: syncTags" + ex.getMessage());
+            throw new DiaryRuntimeException("Failed to sync tags: " + ex.getMessage());
+        }
     }
 
-//    @Override
-//    public List<ListDiaryResponseDTO> fetchDiaryList() {
-//
-//        return null;
-//    }
 }
