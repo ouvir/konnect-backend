@@ -3,6 +3,9 @@ package com.konnect.diary.service;
 import com.konnect.diary.dto.CreateDiaryDraftRequestDTO;
 import com.konnect.diary.dto.CreateDiaryResponseDTO;
 //import com.konnect.dto.ListDiaryResponseDTO;
+import com.konnect.diary.dto.DiarySortType;
+import com.konnect.diary.dto.ListDiaryResponseDTO;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -18,4 +21,6 @@ public interface DiaryService {
             MultipartFile thumbnail,
             List<MultipartFile> imageFiles
     );
+
+    List<ListDiaryResponseDTO> fetchDiaries(Long areaId, boolean topOnly, DiarySortType sortedBy);
 }

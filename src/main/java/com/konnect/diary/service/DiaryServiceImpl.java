@@ -1,18 +1,23 @@
 package com.konnect.diary.service;
 
-import com.konnect.diary.dto.CreateDiaryDraftRequestDTO;
-import com.konnect.diary.dto.CreateDiaryResponseDTO;
+import com.konnect.auth.dto.TagResponseDTO;
+import com.konnect.diary.dto.*;
 import com.konnect.diary.entity.DiaryEntity;
 import com.konnect.diary.entity.DiaryTagEntity;
 import com.konnect.diary.repository.DiaryRepository;
 import com.konnect.diary.repository.DiaryTagRepository;
+import com.konnect.diary.repository.ListDiaryProjection;
 import com.konnect.diary.service.exception.DiaryRuntimeException;
 import com.konnect.entity.TagEntity;
 import com.konnect.repository.AreaRepository;
 import com.konnect.repository.TagRepository;
 import com.konnect.user.repository.UserRepository;
+import com.konnect.util.FileStorage;
 import com.konnect.util.ImageManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +40,7 @@ public class DiaryServiceImpl implements DiaryService {
     private final UserRepository userRepository;
 
     private final ImageManager imageManager;
+    private final FileStorage fileStorage;
 
     @Override
     @Transactional
@@ -54,6 +60,49 @@ public class DiaryServiceImpl implements DiaryService {
             List<MultipartFile> imageFiles
     ) {
         return upsertAndSaveDraft(dto, thumbnail, imageFiles, true);
+    }
+
+    @Override
+    public List<ListDiaryResponseDTO> fetchDiaries(Long areaId, boolean topOnly, DiarySortType sortedBy) {
+        Sort sort = switch (sortedBy) {
+            case RECENT  -> Sort.by(Sort.Direction.DESC, "createdAt");
+            case MOST_LIKED -> Sort.by(Sort.Direction.DESC, "likeCount");
+        };
+
+        Pageable pageable = topOnly
+                ? PageRequest.of(0, 4, sort)
+                : PageRequest.of(0, Integer.MAX_VALUE, sort);
+
+        List<ListDiaryProjection> projections = diaryRepository.findDiariesByArea(areaId, pageable);
+
+        return projections.stream()
+                .map(p -> {
+                    // 4.1) 태그 3개 조회
+                    List<TagResponseDTO> tags = diaryTagRepository
+                            .findTop3ByDiary_DiaryIdOrderByIdAsc(p.getDiaryId())
+                            .stream()
+                            .map(t -> new TagResponseDTO(t.getTagId(), t.getName()))
+                            .collect(Collectors.toList());
+
+                    // 4.2) 썸네일 Base64 로딩
+                    String thumbnail = fileStorage.loadThumbnailBase64(p.getDiaryId());
+
+                    // 4.3) AreaDTO 생성
+                    AreaDTO area = new AreaDTO(p.getAreaId(), p.getAreaName());
+
+                    // 4.4) 최종 DTO 빌드
+                    return ListDiaryResponseDTO.builder()
+                            .diaryId(p.getDiaryId())
+                            .title(p.getTitle())
+                            .thumbnailImage(thumbnail)
+                            .area(area)
+                            .likeCount(p.getLikeCount())
+                            .startDate(p.getStartDate())
+                            .endDate(p.getEndDate())
+                            .tags(tags)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 
     private CreateDiaryResponseDTO upsertAndSaveDraft(
