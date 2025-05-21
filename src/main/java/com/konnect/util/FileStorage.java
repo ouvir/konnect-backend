@@ -2,7 +2,8 @@ package com.konnect.util;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface FileStorage {
-    void save(Long diaryId, String fileName, MultipartFile file);
-    public void deleteDirectoryIfExists(Long postId);
+    public void saveAll(Long diaryId, MultipartFile thumbnail, List<MultipartFile> imageFiles);
 }

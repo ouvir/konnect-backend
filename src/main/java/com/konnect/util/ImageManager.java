@@ -12,19 +12,11 @@ public class ImageManager {
 
     private final FileStorage fileStorage;
 
-    public void saveImages(Long postId, List<MultipartFile> imageFiles) {
-        if (imageFiles == null || imageFiles.isEmpty()) return;
-
-        fileStorage.deleteDirectoryIfExists(postId);
-
-        for (int i = 0; i < imageFiles.size(); i++) {
-            MultipartFile image = imageFiles.get(i);
-            String filename = (i + 1) + getExtension(image.getOriginalFilename());
-            fileStorage.save(postId, filename, image);
-        }
-    }
-
-    private String getExtension(String filename) {
-        return filename.substring(filename.lastIndexOf("."));
+    public void saveAllImages(
+            Long diaryId,
+            MultipartFile thumbnail,
+            List<MultipartFile> imageFiles
+    ) {
+        fileStorage.saveAll(diaryId, thumbnail, imageFiles);
     }
 }

@@ -10,19 +10,14 @@ import java.util.Optional;
 
 @Getter
 @Setter
-@NoArgsConstructor()
-@AllArgsConstructor
-@Builder
 @ToString
-public class CreateDiaryRequestDTO {
+public class CreateDiaryDraftRequestDTO {
+    private Optional<Long> diaryId = Optional.empty();
+
     @NotBlank
     private String title;
 
-    @NotBlank
     private Long userId;
-
-    @NotBlank
-    private String status;
 
     private Optional<String> content = Optional.empty();
 
