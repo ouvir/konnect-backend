@@ -5,5 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface FileStorage {
-    public void saveAll(Long diaryId, MultipartFile thumbnail, List<MultipartFile> imageFiles);
+    void saveAll(Long diaryId, MultipartFile thumbnail, List<MultipartFile> imageFiles);
+    String loadThumbnailBase64(Long diaryId);
+    ImageData loadImage(Long diaryId);
 }
