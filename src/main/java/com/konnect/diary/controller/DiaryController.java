@@ -9,6 +9,7 @@ import com.konnect.diary.service.DiaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -124,10 +125,47 @@ public class DiaryController {
         return ResponseEntity.status(status).body(dto);
     }
 
+    @Operation(
+            summary     = "다이어리 목록 조회",
+            description = "특정 지역(areaId)에 속한 게시된 다이어리를 조회합니다. " +
+                    "topOnly=true인 경우 상위 4개, false인 경우 전체를 반환합니다. " +
+                    "sortedBy로 정렬 기준을 지정하세요."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description  = "조회 성공",
+                    content      = @Content(
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = ListDiaryResponseDTO.class)
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
+            @ApiResponse(responseCode = "404", description = "해당 지역의 다이어리가 없음")
+    })
     @GetMapping("/all/diaries")
     public ResponseEntity<List<ListDiaryResponseDTO>> fetchDiaries(
+            @Parameter(
+                    description = "조회할 지역 ID",
+                    required    = true,
+                    schema      = @Schema(type = "integer", example = "42")
+            )
             @RequestParam(name = "areaId") Long areaId,
+
+            @Parameter(
+                    description = "상위 4개만 조회할지 여부",
+                    schema      = @Schema(type = "boolean", defaultValue = "true")
+            )
             @RequestParam(name = "topOnly", defaultValue = "true") boolean topOnly,
+
+            @Parameter(
+                    description = "정렬 기준 (RECENT, MOST_LIKED)",
+                    schema      = @Schema(
+                            implementation = DiarySortType.class,
+                            defaultValue   = "MOST_LIKED"
+                    )
+            )
             @RequestParam(name = "sortedBy", defaultValue = "MOST_LIKED") DiarySortType sortedBy
     ) {
         List<ListDiaryResponseDTO> response = diaryService.fetchDiaries(areaId, topOnly, sortedBy);
