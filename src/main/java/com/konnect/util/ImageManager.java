@@ -19,4 +19,12 @@ public class ImageManager {
     ) {
         fileStorage.saveAll(diaryId, thumbnail, imageFiles);
     }
+
+    public String loadThumbnailImage(Long diaryId) {
+        return fileStorage.loadThumbnailBase64(diaryId);
+    }
+
+    public ImageData loadImage(Long diaryId) {
+        return fileStorage.loadImage(diaryId);
+    }
 }
