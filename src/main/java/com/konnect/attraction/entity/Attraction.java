@@ -23,6 +23,9 @@ public class Attraction {
     @Column(name = "title", length = 500)
     private String title;
 
+    @Column(name = "title_eng", length = 500)
+    private String titleEng;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "content_type_id", referencedColumnName = "content_type_id")
     private ContentType contentType;
@@ -68,5 +71,7 @@ public class Attraction {
     @Column(name = "overview", length = 10000)
     private String overview;
 
+    @Column(name = "overview_eng", length = 10000)
+    private String overviewEng;
     // getters and setters
 }

@@ -17,4 +17,8 @@ public class Sido {
 
     @Column(name = "sido_name", length = 20)
     private String sidoName;
+
+    @Column(name = "sido_name_eng", length = 20)
+    private String sidoNameEng;
+
 }
