@@ -51,15 +51,15 @@ CREATE TABLE `guguns` (
 DROP TABLE IF EXISTS `diaries`;
 
 CREATE TABLE `diaries` (
-                           `diary_id`	bigint auto_increment	NOT NULL,
-                           `user_id`	bigint	NOT NULL,
-                           `area_id`	int	NULL,
-                           `title`	VARCHAR(255)	NULL,
-                           `content`	VARCHAR(255)	NULL,
-                           `start_date`	VARCHAR(30)	NULL,
-                           `end_date`	VARCHAR(30)	NULL,
+                           `diary_id`    bigint auto_increment    NOT NULL,
+                           `user_id`    bigint    NOT NULL,
+                           `area_id`    int    NULL,
+                           `title`    VARCHAR(255)    NULL,
+                           `content`    VARCHAR(255)    NULL,
+                           `start_date`    VARCHAR(30)    NULL,
+                           `end_date`    VARCHAR(30)    NULL,
                            `status` VARCHAR(20) NOT NULL,
-                           `created_at` TIMESTAMP DEFAULT NOW(),
+                           `created_at` VARCHAR(255) NOT NULL,
                            PRIMARY KEY (`diary_id`)
 );
 
@@ -82,6 +82,7 @@ CREATE TABLE `routes` (
                           `no`	int	NOT NULL	COMMENT '명소코드',
                           `diary_id`	bigint	NOT NULL,
                           `idx`	int	NOT NULL,
+                          `distance` DECIMAL(9,3) UNSIGNED,
                           PRIMARY KEY (`id`)
 );
 
@@ -132,10 +133,10 @@ CREATE TABLE `areas` (
 DROP TABLE IF EXISTS `likes`;
 
 CREATE TABLE `likes` (
-                         `like_id`	BIGINT	NOT NULL auto_increment,
-                         `diary_id`	bigint	NOT NULL,
-                         `user_id`	bigint	NOT NULL,
-                         `is_deleted` bool  NOT NULL DEFAULT false,
+                         `like_id`    BIGINT    NOT NULL auto_increment,
+                         `diary_id`    bigint    NOT NULL,
+                         `user_id`    bigint    NOT NULL,
+                         `is_deleted` BOOL NOT NULL DEFAULT FALSE,
                          PRIMARY KEY (`like_id`)
 );
 
