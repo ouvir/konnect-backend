@@ -1,5 +1,6 @@
 package com.konnect.like.service;
 
 public interface LikeService {
-    public void likeDiary(Long diaryId, Long userId);
+    void addLike(Long diaryId, Long userId);
+    void removeLike(Long diaryId, Long userId);
 }

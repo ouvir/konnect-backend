@@ -21,7 +21,7 @@ public class LikeServiceImpl implements LikeService {
     private final UserRepository userRepository;
 
     @Override
-    public void likeDiary(Long diaryId, Long userId) {
+    public void addLike(Long diaryId, Long userId) {
         DiaryEntity diary = diaryRepository
                 .findById(diaryId)
                 .orElseThrow(() -> new DiaryRuntimeException("Diary not found with id: " + diaryId));
@@ -37,6 +37,17 @@ public class LikeServiceImpl implements LikeService {
             likeEntity.setDeleted(false);
         }
 
+        likeRepository.save(likeEntity);
+    }
+
+    public void removeLike(Long diaryId, Long userId) {
+        DiaryEntity diary = diaryRepository
+                .findById(diaryId)
+                .orElseThrow(() -> new DiaryRuntimeException("Diary not found with id: " + diaryId));
+
+        LikeEntity likeEntity = likeRepository.findByDiary_DiaryIdAndUser_UserId(diaryId, userId);
+
+        likeEntity.setDeleted(true);
         likeRepository.save(likeEntity);
     }
 }
