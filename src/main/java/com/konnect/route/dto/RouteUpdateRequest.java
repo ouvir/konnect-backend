@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 @Builder
 public record RouteUpdateRequest(
 
-        @Schema(description = "방문 일시(ISO-8601)", example = "2025-06-16T14:00:00")
-        LocalDateTime visitedAt,
+        @Schema(description = "방문 날짜 인덱스", example = "1")
+        Integer visitedAt,
 
         @Schema(description = "새 방문 순서", example = "2")
         Integer orderIdx,

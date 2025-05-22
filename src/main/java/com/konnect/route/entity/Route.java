@@ -35,14 +35,14 @@ public class Route {
     private Integer orderIdx;
 
     @Column(name = "`date`", nullable = false)
-    private LocalDateTime visitedAt;
+    private Integer visitedAt;
 
     public void updateOrder(int newOrder) {
         this.orderIdx = newOrder;
     }
 
-    public void updateVisitedAt(LocalDateTime dateTime) {
-        this.visitedAt = dateTime;
+    public void updateVisitedAt(Integer date) {
+        this.visitedAt = date;
     }
 
     public void changeAttraction(Attraction attraction) {

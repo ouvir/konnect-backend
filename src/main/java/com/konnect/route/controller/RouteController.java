@@ -1,7 +1,6 @@
 package com.konnect.route.controller;
 
 import com.konnect.auth.dto.CustomUserPrincipal;
-import com.konnect.route.dto.RouteCreateByDateRequest;
 import com.konnect.route.dto.RouteCreateRequest;
 import com.konnect.route.dto.RouteDetailResponse;
 import com.konnect.route.dto.RouteUpdateRequest;
@@ -15,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -31,24 +31,6 @@ public class RouteController {
     private final RouteService routeService;
 
     @Operation(
-            summary = "루트 생성(방문 날짜만 제공)",
-            description = """
-            • yyyy-MM-dd 형식의 <code>visitedDate</code> 를 받습니다.  
-            • 실제 저장 시 시간은 **23:59:59** 로 자동 세팅됩니다.
-            """
-    )
-    @PostMapping("/by-date")
-    public ResponseEntity<Long> createByDate(
-            @Valid @RequestBody RouteCreateByDateRequest req,
-            @AuthenticationPrincipal CustomUserPrincipal userDetails) {
-
-        return ResponseEntity.ok(
-                routeService.createByDate(req, userDetails.getId())
-        );
-    }
-
-
-    @Operation(
             summary = "루트 목록 조회(방문 날짜별)",
             description = """
             • 다이어리 PK + 방문 날짜(yyyy-MM-dd)를 전달하면  
@@ -58,10 +40,10 @@ public class RouteController {
     @GetMapping("/by-date")
     public ResponseEntity<List<RouteDetailResponse>> listByDate(
             @RequestParam Long diaryId,
-            @RequestParam LocalDate visitedDate) {
+            @RequestParam Integer visitedAt) {
 
         return ResponseEntity.ok(
-                routeService.listByDiaryAndDate(diaryId, visitedDate)
+                routeService.listByDiaryAndDate(diaryId, visitedAt)
         );
     }
 
@@ -79,13 +61,14 @@ public class RouteController {
                     content = @Content)
     })
     @PostMapping
-    public ResponseEntity<Long> create(
+    public ResponseEntity<RouteDetailResponse> create(
             @Valid @RequestBody @Parameter(description = "루트 생성 요청 본문", required = true)
             RouteCreateRequest req,
             @AuthenticationPrincipal
             CustomUserPrincipal userDetails
     ) {
-        return ResponseEntity.ok(routeService.create(req, userDetails.getId()));
+        RouteDetailResponse dto = routeService.create(req, userDetails.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
 

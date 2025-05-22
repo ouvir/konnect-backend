@@ -78,6 +78,7 @@ CREATE TABLE `routes` (
                           `no`	int	NOT NULL	COMMENT '명소코드',
                           `diary_id`	bigint	NOT NULL,
                           `idx`	int	NOT NULL,
+                          `date` int NOT NULL,
                           PRIMARY KEY (`id`)
 );
 

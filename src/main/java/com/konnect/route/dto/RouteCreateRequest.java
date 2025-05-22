@@ -19,9 +19,9 @@ public record RouteCreateRequest(
         Long diaryId,
 
         @NotNull
-        @Schema(description = "방문 일시(ISO-8601)", example = "2025-06-15T10:30:00", requiredMode = Schema.RequiredMode.REQUIRED)
-        LocalDateTime visitedAt,
+        @Schema(description = "방문 날짜 인덱스", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
+        Integer visitedAt,
 
-        @Schema(description = "다이어리 내 방문 순서(생략 시 서버가 자동 채번)", example = "1")
+        @Schema(description = "방문날짜 기반 방문 순서(생략 시 서버가 자동 채번)", example = "1")
         Integer orderIdx
 ) { }

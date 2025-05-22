@@ -14,8 +14,8 @@ public record RouteDetailResponse(
         @Schema(description = "다이어리 내 방문 순서", example = "1")
         Integer orderIdx,
 
-        @Schema(description = "방문 일시(ISO-8601)", example = "2025-06-15T10:30:00")
-        LocalDateTime visitedAt,
+        @Schema(description = "방문 날짜 인덱스", example = "1")
+        Integer visitedAt,
 
         @Schema(description = "관광지 상세 정보")
         AttractionDTO attraction
