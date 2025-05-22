@@ -16,6 +16,7 @@ public interface DiaryService {
             MultipartFile thumbnail,
             List<MultipartFile> imageFiles
     );
+
     CreateDiaryResponseDTO publishDraft(
             CreateDiaryDraftRequestDTO dto,
             MultipartFile thumbnail,
@@ -23,4 +24,6 @@ public interface DiaryService {
     );
 
     List<ListDiaryResponseDTO> fetchDiaries(Long areaId, boolean topOnly, DiarySortType sortedBy);
+
+    List<ListDiaryResponseDTO> fetchMyDiaries(Long userId);
 }
