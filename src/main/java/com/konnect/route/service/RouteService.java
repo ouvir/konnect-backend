@@ -16,8 +16,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -32,7 +30,6 @@ public class RouteService {
     /**
      * 루트 생성 + 상세 DTO 반환
      */
-    @Transactional
     public RouteDetailResponse create(RouteCreateRequest dto, Long userId) {
 
         // 1. 본인 소유 다이어리 검증
@@ -53,6 +50,7 @@ public class RouteService {
                         .attraction(attraction)   // FK만 지정 (join 시 사용)
                         .orderIdx(order)
                         .visitedAt(dto.visitedAt())
+                        .distance(dto.distance() != null ? dto.distance() : null)
                         .build()
         );
 
@@ -81,6 +79,7 @@ public class RouteService {
                     .orElseThrow(() -> new EntityNotFoundException("Attraction not found"));
             route.changeAttraction(attraction);
         }
+        if (dto.distance() != null)  route.updateDistance(dto.distance());
     }
 
     /** DELETE */

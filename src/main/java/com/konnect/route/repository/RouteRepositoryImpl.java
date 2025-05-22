@@ -74,6 +74,7 @@ public class RouteRepositoryImpl implements RouteRepositoryCustom {
                         r.id,
                         r.orderIdx,
                         r.visitedAt,
+                        r.distance,
                         attractionProjection(a)
                 ))
                 .from(r)
@@ -117,6 +118,7 @@ public class RouteRepositoryImpl implements RouteRepositoryCustom {
                         route.id,
                         route.orderIdx,
                         route.visitedAt,
+                        route.distance,          // ★ 추가
                         attractionDto           // ← 서브 DTO
                 ))
                 .from(route)

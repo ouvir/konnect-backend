@@ -23,5 +23,8 @@ public record RouteCreateRequest(
         Integer visitedAt,
 
         @Schema(description = "방문날짜 기반 방문 순서(생략 시 서버가 자동 채번)", example = "1")
-        Integer orderIdx
+        Integer orderIdx,
+
+        @Schema(description = "다음 경로까지의 거리", example = "13872")
+        Double distance
 ) { }

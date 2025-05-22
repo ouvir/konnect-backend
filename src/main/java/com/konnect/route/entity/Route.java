@@ -34,8 +34,11 @@ public class Route {
     @Column(name = "idx", nullable = false)
     private Integer orderIdx;
 
-    @Column(name = "`date`", nullable = false)
+    @Column(name = "date", nullable = false)
     private Integer visitedAt;
+
+    @Column(name = "distance")
+    private Double distance;
 
     public void updateOrder(int newOrder) {
         this.orderIdx = newOrder;
@@ -47,5 +50,9 @@ public class Route {
 
     public void changeAttraction(Attraction attraction) {
         this.attraction = attraction;
+    }
+
+    public void updateDistance(Double distance) {
+        this.distance = distance;
     }
 }

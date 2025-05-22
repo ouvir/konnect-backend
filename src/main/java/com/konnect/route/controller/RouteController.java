@@ -3,6 +3,7 @@ package com.konnect.route.controller;
 import com.konnect.auth.dto.CustomUserPrincipal;
 import com.konnect.route.dto.RouteCreateRequest;
 import com.konnect.route.dto.RouteDetailResponse;
+import com.konnect.route.dto.RouteReorderRequest;
 import com.konnect.route.dto.RouteUpdateRequest;
 import com.konnect.route.service.RouteService;
 import com.konnect.util.SearchCondition;
@@ -104,8 +105,8 @@ public class RouteController {
 
             @Valid @RequestBody
             @Parameter(description = "루트 수정 요청 본문", required = true)
-            RouteUpdateRequest req) {
-
+            RouteUpdateRequest req
+    ) {
         routeService.update(id, req);
         return ResponseEntity.ok().build();
     }
@@ -126,30 +127,35 @@ public class RouteController {
     }
 
 
+    @PostMapping("/reorder")
     @Operation(
             summary = "루트 순서 재정렬",
             description = """
-                • 프론트에서 새 순서대로 정렬한 <code>routeId</code> 리스트를 보내면 서버가 일괄 업데이트합니다.  
-                • 응답은 단순 200 OK입니다.
-                """
+        • 프론트에서 새 순서대로 정렬한 <code>routeIds</code> 와
+          각 구간 <code>distances</code> 를 JSON 한 덩어리로 전송합니다.  
+        • 응답은 200 OK
+        """
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "재정렬 성공"),
             @ApiResponse(responseCode = "400", description = "리스트 비어 있음 / 서로 다른 diaryId 포함", content = @Content)
     })
-    @PostMapping("/reorder")
     public ResponseEntity<Void> reorder(
-            @Parameter(
-                    description = "재정렬된 Route PK 리스트",
-                    required = true,
-                    example = "[12, 15, 10, 11]"
-            )
-            @RequestBody List<Long> orderedRouteIds) {
+            @Valid @RequestBody RouteReorderRequest req) {
+
+        List<Long> ids  = req.routeIds();
+        List<Double> ds = req.distances();
 
         int order = 1;
-        for (Long id : orderedRouteIds) {
-            routeService.update(id, new RouteUpdateRequest(null, order++, null));
+        for (int i = 0; i < ids.size() - 1; i++) {
+            routeService.update(ids.get(i),
+                    new RouteUpdateRequest(null, order++, null, ds.get(i)));
         }
+
+        // 마지막 루트: distance = null
+        routeService.update(ids.get(ids.size() - 1),
+                new RouteUpdateRequest(null, order, null, null));
+
         return ResponseEntity.ok().build();
     }
 }

@@ -16,5 +16,8 @@ public record RouteUpdateRequest(
         Integer orderIdx,
 
         @Schema(description = "변경할 관광지 PK", example = "321")
-        Integer attractionNo
+        Integer attractionNo,
+
+        @Schema(description = "다음 경로까지의 거리", example = "13872")
+        Double distance
 ) { }

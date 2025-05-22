@@ -79,6 +79,7 @@ CREATE TABLE `routes` (
                           `diary_id`	bigint	NOT NULL,
                           `idx`	int	NOT NULL,
                           `date` int NOT NULL,
+                          `distance` double,
                           PRIMARY KEY (`id`)
 );
 
