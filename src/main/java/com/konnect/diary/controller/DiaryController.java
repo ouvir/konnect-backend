@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,6 +29,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1")
+@Tag(name = "다이어리", description = "다이어리 관련 API")
 public class DiaryController {
 
     private final DiaryService diaryService;
@@ -89,6 +91,10 @@ public class DiaryController {
         return ResponseEntity.status(status).body(dto);
     }
 
+    @Operation(
+            summary = "임시 저장 다이어리 게시",
+            description = "드래프트(draft) 상태인 다이어리를 게시 상태로 변경합니다.게시된 다이어리는 수정이 불가합니다."
+    )
     @PostMapping("/user/diaries/{diaryId}/publish")
     @ResponseBody
     public ResponseEntity<CreateDiaryResponseDTO> publishDiary(
