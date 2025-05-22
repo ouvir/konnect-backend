@@ -25,7 +25,20 @@ public class LikeController {
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
         try {
-            likeService.likeDiary(diaryId, userDetails.getId());
+            likeService.addLike(diaryId, userDetails.getId());
+            return ResponseEntity.ok().build();
+        } catch (DiaryRuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/diaries/{diaryId}/unlike")
+    public ResponseEntity unlikeDiary(
+            @PathVariable Long diaryId,
+            @AuthenticationPrincipal CustomUserPrincipal userDetails
+    ) {
+        try {
+            likeService.removeLike(diaryId, userDetails.getId());
             return ResponseEntity.ok().build();
         } catch (DiaryRuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
