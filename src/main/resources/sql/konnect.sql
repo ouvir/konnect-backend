@@ -8,6 +8,7 @@ CREATE TABLE `attractions` (
                                `no`	int	NOT NULL auto_increment COMMENT '명소코드',
                                `content_id`	int	NULL	DEFAULT NULL	COMMENT '콘텐츠번호',
                                `title`	varchar(500)	NULL	DEFAULT NULL	COMMENT '명소이름',
+                               `title_eng`	varchar(500)	NULL	DEFAULT NULL	COMMENT '명소이름(영문)',
                                `content_type_id`	int	NULL	DEFAULT NULL COMMENT '콘텐츠타입',
                                `area_code`	int	NULL	DEFAULT NULL	COMMENT '시도코드',
                                `si_gun_gu_code`	int	NULL	DEFAULT NULL	COMMENT '구군코드',
@@ -19,8 +20,9 @@ CREATE TABLE `attractions` (
                                `tel`	varchar(20)	NULL	DEFAULT NULL	COMMENT '전화번호',
                                `addr1`	varchar(100)	NULL	DEFAULT NULL	COMMENT '주소1',
                                `addr2`	varchar(100)	NULL	DEFAULT NULL	COMMENT '주소2',
-                               `homepage`	varchar(1000)	NULL	DEFAULT NULL	COMMENT '홈페이지',
-                               `overview`	varchar(10000)	NULL	DEFAULT NULL	COMMENT '설명',
+                               `homepage` TEXT NULL DEFAULT NULL COMMENT '홈페이지',
+                               `overview` TEXT NULL DEFAULT NULL COMMENT '설명',
+                               `overview_eng` TEXT NULL DEFAULT NULL COMMENT '설명(영문)',
                                PRIMARY KEY (`no`)
 );
 
@@ -41,6 +43,7 @@ CREATE TABLE `guguns` (
                           `sido_code`    int    NOT NULL     COMMENT '시도코드',
                           `gugun_code`    int    NOT NULL    COMMENT '구군코드',
                           `gugun_name`    varchar(20)    NULL    DEFAULT NULL    COMMENT '구군이름',
+                          `gugun_name_eng`    varchar(20)    NULL    DEFAULT NULL    COMMENT '구군이름(영문)',
                           PRIMARY KEY (`no`),
                           INDEX `idx_gugun_code` (`gugun_code`)
 );
@@ -48,14 +51,15 @@ CREATE TABLE `guguns` (
 DROP TABLE IF EXISTS `diaries`;
 
 CREATE TABLE `diaries` (
-                           `diary_id`	bigint auto_increment	NOT NULL,
-                           `user_id`	bigint	NOT NULL,
-                           `area_id`	int	NULL,
-                           `title`	VARCHAR(255)	NULL,
-                           `content`	VARCHAR(255)	NULL,
-                           `start_date`	VARCHAR(30)	NULL,
-                           `end_date`	VARCHAR(30)	NULL,
+                           `diary_id`    bigint auto_increment    NOT NULL,
+                           `user_id`    bigint    NOT NULL,
+                           `area_id`    int    NULL,
+                           `title`    VARCHAR(255)    NULL,
+                           `content`    VARCHAR(255)    NULL,
+                           `start_date`    VARCHAR(30)    NULL,
+                           `end_date`    VARCHAR(30)    NULL,
                            `status` VARCHAR(20) NOT NULL,
+                           `created_at` VARCHAR(255) NOT NULL,
                            PRIMARY KEY (`diary_id`)
 );
 
@@ -78,6 +82,7 @@ CREATE TABLE `routes` (
                           `no`	int	NOT NULL	COMMENT '명소코드',
                           `diary_id`	bigint	NOT NULL,
                           `idx`	int	NOT NULL,
+                          `distance` DECIMAL(9,3) UNSIGNED,
                           PRIMARY KEY (`id`)
 );
 
@@ -96,6 +101,7 @@ CREATE TABLE `sidos` (
                          `no`	int	NOT NULL	auto_increment COMMENT '시도번호',
                          `sido_code`	int	NOT NULL UNIQUE	COMMENT '시도코드',
                          `sido_name`	varchar(20)	NULL	DEFAULT NULL	COMMENT '시도이름',
+                         `sido_name_eng`	varchar(20)	NULL	DEFAULT NULL	COMMENT '시도이름(영문)',
                          PRIMARY KEY (`no`)
 );
 
@@ -104,6 +110,7 @@ DROP TABLE IF EXISTS `contenttypes`;
 CREATE TABLE `contenttypes` (
                                 `content_type_id`	int	NOT NULL auto_increment	COMMENT '콘텐츠타입번호',
                                 `content_type_name`	varchar(45)	NULL	DEFAULT NULL	COMMENT '콘텐츠타입이름',
+                                `content_type_name_eng`	varchar(45)	NULL	DEFAULT NULL	COMMENT '콘텐츠타입이름(영문)',
                                 PRIMARY KEY (`content_type_id`)
 );
 
@@ -126,9 +133,10 @@ CREATE TABLE `areas` (
 DROP TABLE IF EXISTS `likes`;
 
 CREATE TABLE `likes` (
-                         `like_id`	BIGINT	NOT NULL auto_increment,
-                         `diary_id`	bigint	NOT NULL,
-                         `user_id`	bigint	NOT NULL,
+                         `like_id`    BIGINT    NOT NULL auto_increment,
+                         `diary_id`    bigint    NOT NULL,
+                         `user_id`    bigint    NOT NULL,
+                         `is_deleted` BOOL NOT NULL DEFAULT FALSE,
                          PRIMARY KEY (`like_id`)
 );
 

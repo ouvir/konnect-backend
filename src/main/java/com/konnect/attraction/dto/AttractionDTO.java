@@ -26,11 +26,18 @@ public class AttractionDTO implements CursorPage.Identifiable {
     @Schema(description = "제목")
     private String title;
 
+    @Schema(description = "제목(영문)")
+    private String titleEng;
+
     @Schema(description = "콘텐츠 타입 ID")
     private Integer contentTypeId;
 
     @Schema(description = "콘텐츠 타입 이름")
     private String contentTypeName;
+
+    @Schema(description = "콘텐츠 타입 이름(영문)")
+    private String contentTypeNameEng;
+
 
     @Schema(description = "시도 코드")
     private Integer areaCode;
@@ -38,11 +45,17 @@ public class AttractionDTO implements CursorPage.Identifiable {
     @Schema(description = "시도 이름")
     private String sidoName;
 
+    @Schema(description = "시도 이름(영문)")
+    private String sidoNameEng;
+
     @Schema(description = "구군 코드")
     private Integer gugunCode;
 
     @Schema(description = "구군 이름")
     private String gugunName;
+
+    @Schema(description = "구군 이름(영문)")
+    private String gugunNameEng;
 
     @Schema(description = "대표 이미지 1")
     private String firstImage1;
@@ -73,6 +86,9 @@ public class AttractionDTO implements CursorPage.Identifiable {
 
     @Schema(description = "설명")
     private String overview;
+
+    @Schema(description = "설명(영문)")
+    private String overviewEng;
 
     @Override
     public Long getId() {
