@@ -5,6 +5,8 @@ public interface ListDiaryProjection {
 
     String getTitle();
 
+    String getStatus();
+
     Long getAreaId();
 
     String getAreaName();
