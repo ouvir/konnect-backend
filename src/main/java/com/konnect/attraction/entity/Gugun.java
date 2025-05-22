@@ -18,6 +18,9 @@ public class Gugun {
     @Column(name = "gugun_name", length = 20)
     private String gugunName;
 
+    @Column(name = "gugun_name_eng", length = 20)
+    private String gugunNameEng;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sido_code", referencedColumnName = "sido_code")
     private Sido sido;

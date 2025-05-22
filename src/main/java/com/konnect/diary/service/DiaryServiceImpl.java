@@ -15,6 +15,7 @@ import com.konnect.user.repository.UserRepository;
 import com.konnect.util.FileStorage;
 import com.konnect.util.ImageManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -64,45 +65,60 @@ public class DiaryServiceImpl implements DiaryService {
 
     @Override
     public List<ListDiaryResponseDTO> fetchDiaries(Long areaId, boolean topOnly, DiarySortType sortedBy) {
-        Sort sort = switch (sortedBy) {
-            case RECENT  -> Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = createPageable(topOnly, sortedBy);
+        Page<ListDiaryProjection> pages = diaryRepository.findDiariesByArea(areaId, pageable);
+        return toResponseList(pages);
+    }
+
+    @Override
+    public List<ListDiaryResponseDTO> fetchMyDiaries(Long userId) {
+        Pageable pageable = PageRequest.of(
+                0, Integer.MAX_VALUE,
+                Sort.by(Sort.Order.asc("status"), Sort.Order.desc("created_at"))
+        );
+        Page<ListDiaryProjection> pages = diaryRepository.fetchMyDiaries(userId, pageable);
+        return toResponseList(pages);
+    }
+
+    // ———————————— 헬퍼 1: Pageable 생성 분리
+    private Pageable createPageable(boolean topOnly, DiarySortType sortType) {
+        Sort sort = switch (sortType) {
+            case RECENT     -> Sort.by(Sort.Direction.DESC, "created_at");
             case MOST_LIKED -> Sort.by(Sort.Direction.DESC, "likeCount");
         };
+        int size = topOnly ? 4 : Integer.MAX_VALUE;
+        return PageRequest.of(0, size, sort);
+    }
 
-        Pageable pageable = topOnly
-                ? PageRequest.of(0, 4, sort)
-                : PageRequest.of(0, Integer.MAX_VALUE, sort);
-
-        List<ListDiaryProjection> projections = diaryRepository.findDiariesByArea(areaId, pageable);
-
-        return projections.stream()
-                .map(p -> {
-                    // 4.1) 태그 3개 조회
-                    List<TagResponseDTO> tags = diaryTagRepository
-                            .findTop3ByDiary_DiaryIdOrderByIdAsc(p.getDiaryId())
-                            .stream()
-                            .map(t -> new TagResponseDTO(t.getTagId(), t.getName()))
-                            .collect(Collectors.toList());
-
-                    // 4.2) 썸네일 Base64 로딩
-                    String thumbnail = fileStorage.loadThumbnailBase64(p.getDiaryId());
-
-                    // 4.3) AreaDTO 생성
-                    AreaDTO area = new AreaDTO(p.getAreaId(), p.getAreaName());
-
-                    // 4.4) 최종 DTO 빌드
-                    return ListDiaryResponseDTO.builder()
-                            .diaryId(p.getDiaryId())
-                            .title(p.getTitle())
-                            .thumbnailImage(thumbnail)
-                            .area(area)
-                            .likeCount(p.getLikeCount())
-                            .startDate(p.getStartDate())
-                            .endDate(p.getEndDate())
-                            .tags(tags)
-                            .build();
-                })
+    // ———————————— 헬퍼 2: Projection → Response 로 전환
+    private List<ListDiaryResponseDTO> toResponseList(Page<ListDiaryProjection> pages) {
+        return pages.getContent().stream()
+                .map(this::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    // ———————————— 헬퍼 3: 개별 Projection → DTO 변환
+    private ListDiaryResponseDTO toResponse(ListDiaryProjection p) {
+        List<TagResponseDTO> tags = diaryTagRepository
+                .findTop3ByDiary_DiaryIdOrderByIdAsc(p.getDiaryId())
+                .stream()
+                .map(t -> new TagResponseDTO(t.getTagId(), t.getName()))
+                .collect(Collectors.toList());
+
+        String thumbnail = fileStorage.loadThumbnailBase64(p.getDiaryId());
+        AreaDTO area     = new AreaDTO(p.getAreaId(), p.getAreaName());
+
+        return ListDiaryResponseDTO.builder()
+                .diaryId(p.getDiaryId())
+                .title(p.getTitle())
+                .status(p.getStatus())
+                .thumbnailImage(thumbnail)
+                .area(area)
+                .likeCount(p.getLikeCount())
+                .startDate(p.getStartDate())
+                .endDate(p.getEndDate())
+                .tags(tags)
+                .build();
     }
 
     private CreateDiaryResponseDTO upsertAndSaveDraft(
@@ -239,4 +255,5 @@ public class DiaryServiceImpl implements DiaryService {
         String prefix = "data:" + file.getContentType() + ";base64,";
         return prefix + Base64.getEncoder().encodeToString(bytes);
     }
+
 }
