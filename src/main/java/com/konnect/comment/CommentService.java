@@ -1,7 +1,8 @@
 package com.konnect.comment;
 
 import com.konnect.comment.dto.CommentDto;
-import com.konnect.comment.dto.CommentRequest;
+import com.konnect.comment.dto.CreateCommentRequest;
+import com.konnect.comment.dto.CreateReplyRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,7 @@ public class CommentService {
         return dto;
     }
 
-    public void createComment(Long userId, CommentRequest request) {
+    public CommentDto createComment(Long userId, CreateCommentRequest request) {
         Comment comment = new Comment();
         comment.setDiaryId(request.getDiaryId());
         comment.setUserId(userId);
@@ -36,10 +37,10 @@ public class CommentService {
         comment.setCreatedAt(request.getCreatedAt());
         comment.setDeleted(false);
         comment.setParent(null);
-        commentRepository.save(comment);
+        return CommentDto.from(commentRepository.save(comment));
     }
 
-    public void createReply(Long userId, CommentRequest request) {
+    public CommentDto createReply(Long userId, CreateReplyRequest request) {
         Comment parent = commentRepository.findById(request.getParentId())
                 .orElseThrow(() -> new RuntimeException("부모 댓글 없음"));
 
@@ -54,10 +55,10 @@ public class CommentService {
         reply.setCreatedAt(request.getCreatedAt());
         reply.setDeleted(false);
         reply.setParent(parent);
-        commentRepository.save(reply);
+        return CommentDto.from(commentRepository.save(reply));
     }
 
-    public void updateComment(Long userId, Long id, String content) {
+    public CommentDto updateComment(Long userId, Long id, String content) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("댓글 없음"));
 
@@ -66,7 +67,7 @@ public class CommentService {
         }
 
         comment.setContent(content);
-        commentRepository.save(comment);
+        return CommentDto.from(commentRepository.save(comment));
     }
 
     public void deleteComment(Long userId, Long id) {
