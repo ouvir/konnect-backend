@@ -34,18 +34,25 @@ public class Route {
     @Column(name = "idx", nullable = false)
     private Integer orderIdx;
 
-    @Column(name = "`date`", nullable = false)
-    private LocalDateTime visitedAt;
+    @Column(name = "date", nullable = false)
+    private Integer visitedAt;
+
+    @Column(name = "distance")
+    private Double distance;
 
     public void updateOrder(int newOrder) {
         this.orderIdx = newOrder;
     }
 
-    public void updateVisitedAt(LocalDateTime dateTime) {
-        this.visitedAt = dateTime;
+    public void updateVisitedAt(Integer date) {
+        this.visitedAt = date;
     }
 
     public void changeAttraction(Attraction attraction) {
         this.attraction = attraction;
+    }
+
+    public void updateDistance(Double distance) {
+        this.distance = distance;
     }
 }
