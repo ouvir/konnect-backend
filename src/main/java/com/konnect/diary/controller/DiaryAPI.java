@@ -144,4 +144,24 @@ public interface DiaryAPI {
             )
             @RequestParam(name = "sortedBy", defaultValue = "MOST_LIKED") DiarySortType sortedBy
     );
+    @Operation(
+            summary     = "마이페이지 다이어리 목록 조회",
+            description = "내 다이어리 목록을 조회합니다. " +
+                    "수정 중인 다이어리가 가장 최상단에 불러와지며, " +
+                    "그 다음 다이어리들은 최신순으로 조회합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description  = "조회 성공",
+                    content      = @Content(
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = ListDiaryResponseDTO.class)
+                            )
+                    )
+            ),
+    })
+    public ResponseEntity<List<ListDiaryResponseDTO>> fetchMyDiaries(
+            @AuthenticationPrincipal CustomUserPrincipal userDetails
+    );
 }
