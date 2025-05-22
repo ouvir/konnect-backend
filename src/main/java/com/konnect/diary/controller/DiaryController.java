@@ -31,6 +31,7 @@ public class DiaryController implements DiaryAPI {
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
+
         requestDTO.setUserId(userDetails.getId());
         CreateDiaryResponseDTO dto =
                 diaryService.createDiaryDraft(requestDTO, thumbnail, imageFiles);
@@ -63,6 +64,14 @@ public class DiaryController implements DiaryAPI {
             @RequestParam(name = "sortedBy", defaultValue = "MOST_LIKED") DiarySortType sortedBy
     ) {
         List<ListDiaryResponseDTO> response = diaryService.fetchDiaries(areaId, topOnly, sortedBy);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/user/diaries")
+    public ResponseEntity<List<ListDiaryResponseDTO>> fetchMyDiaries(
+            @AuthenticationPrincipal CustomUserPrincipal userDetails
+    ) {
+        List<ListDiaryResponseDTO> response = diaryService.fetchMyDiaries(userDetails.getId());
         return ResponseEntity.ok(response);
     }
 
