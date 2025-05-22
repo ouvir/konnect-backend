@@ -7,10 +7,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.konnect.auth.dto.CustomUserPrincipal;
-import com.konnect.user.dto.UserDTO;
-import com.konnect.auth.jwt.JWTUtil;
-import com.konnect.auth.oauth2.CustomSuccessHandler;
+import com.konnect.dto.CustomUserPrincipal;
+import com.konnect.dto.UserDTO;
+import com.konnect.security.jwt.JWTUtil;
+import com.konnect.security.oauth2.CustomSuccessHandler;
 import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;

@@ -1,7 +1,7 @@
 package com.konnect.security;
 
-import com.konnect.user.entity.UserEntity;
-import com.konnect.user.repository.UserRepository;
+import com.konnect.entity.UserEntity;
+import com.konnect.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

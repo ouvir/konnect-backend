@@ -2,14 +2,10 @@ spring:
   application:
     name: Konnect
 
-  servlet:
-    multipart:
-      max-file-size: 20MB
-      max-request-size: 30MB
-
   config:
     import:
       - "classpath:application-secret.yml"
+      - file:.env.dev[.properties]
 
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
@@ -29,18 +25,3 @@ spring:
 
 client:
   url: ${CLIENT_URL}
-
-springdoc:
-  swagger-ui:
-    # "Try it out" 버튼을 GET 에서만 활성화
-    supported-submit-methods: get
-    # 알파벳 순 정렬
-    tags-sorter: alpha
-    # 메서드 순 정렬
-    operations-sorter : method
-    # 접힌 상태로 시작
-    doc-expansion : none
-
-storage:
-  image:
-    path: ${STORAGE_IMAGE_DIRECTORY_PATH}
