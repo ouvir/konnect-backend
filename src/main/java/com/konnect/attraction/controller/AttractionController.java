@@ -42,8 +42,14 @@ public class AttractionController {
             @Parameter(description = "한 페이지 당 항목 수", example = "10")
             @RequestParam(defaultValue = "10") int size,
 
-            @Parameter(description = "관광지 제목 키워드", example = "서울")
+            @Parameter(description = "관광지 제목 키워드", example = "백년")
             @RequestParam(required = false) String title,
+
+            @Parameter(description = "관광지 지역 키워드", example = "서울")
+            @RequestParam(required = false) String area,
+
+            @Parameter(description = "관광지 지역 코드", example = "1")
+            @RequestParam(required = false) String areaCode,
 
             @Parameter(description = "콘텐츠 타입 ID", example = "")
             @RequestParam(required = false) String contentTypeId,
@@ -53,6 +59,8 @@ public class AttractionController {
     ) {
         SearchCondition condition = new SearchCondition();
         condition.put("title", title);
+        condition.put("area", area);
+        condition.put("areaCode", areaCode);
         condition.put("contentTypeId", contentTypeId);
         condition.put("contentTypeName", contentTypeName);
 

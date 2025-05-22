@@ -20,7 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("api/v1")
 public class DiaryController implements DiaryAPI {
-
+  
     private final DiaryService diaryService;
 
     @PostMapping(path = "/user/diaries/draft")
