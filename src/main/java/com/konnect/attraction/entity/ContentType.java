@@ -17,5 +17,8 @@ public class ContentType {
 
     @Column(name = "content_type_name", length = 45)
     private String contentTypeName;
+
+    @Column(name = "content_type_name_eng", length = 45)
+    private String contentTypeNameEng;
 }
 

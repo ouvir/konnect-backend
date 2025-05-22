@@ -48,12 +48,16 @@ public class AttractionRepositoryImpl implements AttractionRepositoryCustom {
                         attraction.no,
                         attraction.contentId,
                         attraction.title,
+                        attraction.titleEng,
                         attraction.contentType.contentTypeId.as("contentTypeId"),
                         attraction.contentType.contentTypeName.as("contentTypeName"),
+                        attraction.contentType.contentTypeNameEng.as("contentTypeNameEng"),
                         attraction.sido.sidoCode.as("areaCode"),
                         attraction.sido.sidoName.as("sidoName"),
+                        attraction.sido.sidoNameEng.as("sidoNameEng"),
                         attraction.gugun.gugunCode.as("gugunCode"),
                         attraction.gugun.gugunName.as("gugunName"),
+                        attraction.gugun.gugunNameEng.as("gugunNameEng"),
                         attraction.firstImage1,
                         attraction.firstImage2,
                         attraction.mapLevel,
@@ -63,7 +67,8 @@ public class AttractionRepositoryImpl implements AttractionRepositoryCustom {
                         attraction.addr1,
                         attraction.addr2,
                         attraction.homepage,
-                        attraction.overview
+                        attraction.overview,
+                        attraction.overviewEng
                 ))
                 .from(attraction)
                 .leftJoin(attraction.contentType, QContentType.contentType)
@@ -96,12 +101,16 @@ public class AttractionRepositoryImpl implements AttractionRepositoryCustom {
                         attraction.no,
                         attraction.contentId,
                         attraction.title,
+                        attraction.titleEng,
                         attraction.contentType.contentTypeId.as("contentTypeId"),
                         attraction.contentType.contentTypeName.as("contentTypeName"),
+                        attraction.contentType.contentTypeNameEng.as("contentTypeNameEng"),
                         attraction.sido.sidoCode.as("areaCode"),
                         attraction.sido.sidoName.as("sidoName"),
+                        attraction.sido.sidoNameEng.as("sidoNameEng"),
                         attraction.gugun.gugunCode.as("gugunCode"),
                         attraction.gugun.gugunName.as("gugunName"),
+                        attraction.gugun.gugunNameEng.as("gugunNameEng"),
                         attraction.firstImage1,
                         attraction.firstImage2,
                         attraction.mapLevel,
@@ -111,7 +120,8 @@ public class AttractionRepositoryImpl implements AttractionRepositoryCustom {
                         attraction.addr1,
                         attraction.addr2,
                         attraction.homepage,
-                        attraction.overview
+                        attraction.overview,
+                        attraction.overviewEng
                 ))
                 .from(attraction)
                 .leftJoin(attraction.contentType, contentType)
