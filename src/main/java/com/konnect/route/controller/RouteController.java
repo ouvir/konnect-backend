@@ -5,6 +5,7 @@ import com.konnect.route.dto.RouteCreateRequest;
 import com.konnect.route.dto.RouteDetailResponse;
 import com.konnect.route.dto.RouteUpdateRequest;
 import com.konnect.route.service.RouteService;
+import com.konnect.util.SearchCondition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -29,23 +30,6 @@ import java.util.List;
 public class RouteController {
 
     private final RouteService routeService;
-
-    @Operation(
-            summary = "루트 목록 조회(방문 날짜별)",
-            description = """
-            • 다이어리 PK + 방문 날짜(yyyy-MM-dd)를 전달하면  
-              해당 날짜의 루트들을 **방문 시간 오름차순**(visitedAt ASC)으로 반환합니다.
-            """
-    )
-    @GetMapping("/by-date")
-    public ResponseEntity<List<RouteDetailResponse>> listByDate(
-            @RequestParam Long diaryId,
-            @RequestParam Integer visitedAt) {
-
-        return ResponseEntity.ok(
-                routeService.listByDiaryAndDate(diaryId, visitedAt)
-        );
-    }
 
     @Operation(
             summary = "루트 생성",
@@ -85,9 +69,20 @@ public class RouteController {
     @GetMapping
     public ResponseEntity<List<RouteDetailResponse>> list(
             @Parameter(description = "다이어리 PK", required = true, example = "3")
-            @RequestParam Long diaryId) {
+            @RequestParam Long diaryId,
 
-        return ResponseEntity.ok(routeService.listByDiary(diaryId));
+            @Parameter(description = "여행 날짜 인덱스", example = "1")
+            @RequestParam(required = false)
+            Integer visitedAt
+        ) {
+        SearchCondition cond = new SearchCondition();
+        cond.put("diaryId", String.valueOf(diaryId));
+
+        if (visitedAt != null) {
+            cond.put("visitedAt", String.valueOf(visitedAt));
+        }
+
+        return ResponseEntity.ok(routeService.list(cond));
     }
 
 

@@ -9,6 +9,7 @@ import com.konnect.route.dto.RouteDetailResponse;
 import com.konnect.route.dto.RouteUpdateRequest;
 import com.konnect.route.entity.Route;
 import com.konnect.route.repository.RouteRepository;
+import com.konnect.util.SearchCondition;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -63,8 +64,9 @@ public class RouteService {
 
     /** READ (다이어리별) */
     @Transactional(readOnly = true)
-    public List<RouteDetailResponse> listByDiary(Long diaryId) {
-        return routeRepository.searchByDiary(diaryId);
+    public List<RouteDetailResponse> list(SearchCondition condition) {
+        Long diaryId = Long.valueOf(condition.get("diaryId"));
+        return routeRepository.searchByDiary(diaryId, condition);
     }
 
     /** UPDATE */
@@ -84,11 +86,6 @@ public class RouteService {
     /** DELETE */
     public void delete(Long id) {
         routeRepository.deleteById(id);
-    }
-
-    @Transactional(readOnly = true)
-    public List<RouteDetailResponse> listByDiaryAndDate(Long diaryId, Integer date) {
-        return routeRepository.searchByDiaryAndDate(diaryId, date);
     }
 
     /* 공통 유틸 */

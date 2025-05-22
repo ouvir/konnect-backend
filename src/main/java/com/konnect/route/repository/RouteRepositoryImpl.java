@@ -4,6 +4,8 @@ import com.konnect.attraction.dto.AttractionDTO;
 import com.konnect.attraction.entity.QAttraction;
 import com.konnect.route.dto.RouteDetailResponse;
 import com.konnect.route.entity.QRoute;
+import com.konnect.util.SearchCondition;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -55,9 +57,17 @@ public class RouteRepositoryImpl implements RouteRepositoryCustom {
     }
 
     @Override
-    public List<RouteDetailResponse> searchByDiary(Long diaryId) {
+    public List<RouteDetailResponse> searchByDiary(Long diaryId, SearchCondition condition) {
         QRoute r = QRoute.route;
         QAttraction a = QAttraction.attraction;
+
+        BooleanBuilder where = new BooleanBuilder();
+        where.and(r.diary.diaryId.eq(diaryId));
+
+        if (condition.has("visitedAt")) {
+            Integer visitedAt = Integer.parseInt(condition.get("visitedAt"));
+            where.and(r.visitedAt.eq(visitedAt));
+        }
 
         return query
                 .select(Projections.constructor(RouteDetailResponse.class,
@@ -68,28 +78,8 @@ public class RouteRepositoryImpl implements RouteRepositoryCustom {
                 ))
                 .from(r)
                 .join(r.attraction, a)
-                .where(r.diary.diaryId.eq(diaryId))
+                .where(where)
                 .orderBy(r.orderIdx.asc())
-                .fetch();
-    }
-
-    @Override
-    public List<RouteDetailResponse> searchByDiaryAndDate(Long diaryId, Integer date) {
-        QRoute r = QRoute.route;
-        QAttraction a = QAttraction.attraction;
-
-        return query
-                .select(Projections.constructor(RouteDetailResponse.class,
-                        r.id,
-                        r.orderIdx,
-                        r.visitedAt,
-                        attractionProjection(a)
-                ))
-                .from(r)
-                .join(r.attraction, a)
-                .where(r.diary.diaryId.eq(diaryId)
-                        .and(r.visitedAt.eq(date)))
-                .orderBy(r.visitedAt.asc())
                 .fetch();
     }
 
