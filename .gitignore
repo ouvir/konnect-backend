@@ -44,3 +44,5 @@ gradle/
 
 # ───────────────────────── Query DSL ─────────────────────
 /src/main/generated/
+gradlew
+gradlew.bat
