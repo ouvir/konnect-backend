@@ -28,10 +28,10 @@ public class CommentService {
         return dto;
     }
 
-    public void createComment(CommentRequest request) {
+    public void createComment(Long userId, CommentRequest request) {
         Comment comment = new Comment();
         comment.setDiaryId(request.getDiaryId());
-        comment.setUserId(request.getUserId());
+        comment.setUserId(userId);
         comment.setContent(request.getContent());
         comment.setCreatedAt(request.getCreatedAt());
         comment.setDeleted(false);
@@ -39,7 +39,7 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    public void createReply(CommentRequest request) {
+    public void createReply(Long userId, CommentRequest request) {
         Comment parent = commentRepository.findById(request.getParentId())
                 .orElseThrow(() -> new RuntimeException("부모 댓글 없음"));
 
@@ -49,7 +49,7 @@ public class CommentService {
 
         Comment reply = new Comment();
         reply.setDiaryId(request.getDiaryId());
-        reply.setUserId(request.getUserId());
+        reply.setUserId(userId);
         reply.setContent(request.getContent());
         reply.setCreatedAt(request.getCreatedAt());
         reply.setDeleted(false);
@@ -57,16 +57,26 @@ public class CommentService {
         commentRepository.save(reply);
     }
 
-    public void updateComment(Long id, String content) {
+    public void updateComment(Long userId, Long id, String content) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("댓글 없음"));
+
+        if (!comment.getUserId().equals(userId)) {
+            throw new RuntimeException("본인의 댓글만 수정할 수 있습니다.");
+        }
+
         comment.setContent(content);
         commentRepository.save(comment);
     }
 
-    public void deleteComment(Long id) {
+    public void deleteComment(Long userId, Long id) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("댓글 없음"));
+
+        if (!comment.getUserId().equals(userId)) {
+            throw new RuntimeException("본인의 댓글만 삭제할 수 있습니다.");
+        }
+
         comment.setDeleted(true);
         commentRepository.save(comment);
     }

@@ -1,12 +1,13 @@
 package com.konnect.comment.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class CommentRequest {
-    private Long userId;
     private Long diaryId;
-    private Long parentId; // 댓글이면 null, 대댓글이면 부모 ID
+    private Long parentId;
     private String content;
-    private String createdAt; // 프론트에서 받는 시간
+    private String createdAt;
 }
