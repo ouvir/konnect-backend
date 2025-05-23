@@ -81,8 +81,8 @@ CREATE TABLE `routes` (
                           `id`	int	NOT NULL auto_increment,
                           `no`	int	NOT NULL	COMMENT '명소코드',
                           `diary_id`	bigint	NOT NULL,
-                          `idx`	int	NOT NULL,
-                          `date` int NOT NULL,
+                          `visitedDate` VARCHAR(20),
+                          `visitedTime` VARCHAR(20),
                           `distance` double,
                           PRIMARY KEY (`id`)
 );
@@ -128,6 +128,7 @@ DROP TABLE IF EXISTS `areas`;
 CREATE TABLE `areas` (
                          `area_id`	int	NOT NULL auto_increment,
                          `name`	VARCHAR(255)	NOT NULL,
+                         `name_eng` VARCHAR(255)	NOT NULL,
                          PRIMARY KEY (`area_id`)
 );
 

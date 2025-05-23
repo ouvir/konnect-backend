@@ -30,7 +30,7 @@ public class AttractionRepositoryImpl implements AttractionRepositoryCustom {
             where.and(attraction.title.containsIgnoreCase(condition.get("title")));
         }
         if (condition.has("area")) {
-            where.and(attraction.title.containsIgnoreCase(condition.get("addr1")));
+            where.and(attraction.addr1.containsIgnoreCase(condition.get("area")));
         }
         if (condition.has("areaCode")) {
             Integer areaCode = Integer.parseInt(condition.get("areaCode"));
