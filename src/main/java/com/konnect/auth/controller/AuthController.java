@@ -10,10 +10,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -86,7 +88,8 @@ public class AuthController {
     )
     @Profile("dev")
     @PostMapping("api/v1/all/auth/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<String> login(@RequestBody LoginRequest request, HttpServletRequest request1) {
+        System.out.println(request1.getHeader("Authorization"));
         // Swagger에서 테스트 가능하게 Dummy 컨트롤러 구현 (실제 처리는 Filter)
         return ResponseEntity.ok("로그인 성공");
     }

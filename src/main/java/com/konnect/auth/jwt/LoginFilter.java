@@ -28,7 +28,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         this.jwtUtil = jwtUtil;
 
         // 로그인 URL 변경
-        setFilterProcessesUrl("/api/v1/auth/login");
+        setFilterProcessesUrl("/api/v1/all/auth/login");
     }
 
     @Override
@@ -54,7 +54,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         }
     }
 
-    //로그인 성공시 메소드 (JWT 발급)
     @Override
     protected void successfulAuthentication(
             HttpServletRequest request,
@@ -65,18 +64,28 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         CustomUserPrincipal customUserDetails = (CustomUserPrincipal) authentication.getPrincipal();
 
         Long userId = customUserDetails.getId();
+        String role = authentication.getAuthorities().iterator().next().getAuthority();
 
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-        GrantedAuthority auth = iterator.next();
-
-        String role = auth.getAuthority();
-
+        // JWT 발급
         String token = jwtUtil.createJwt(userId, role);
 
-        // Cookie에 담아 전달
-        response.addCookie(jwtUtil.createCookie("Authorization", token));
+        // [옵션 1] Authorization 헤더에 담기
+        response.setHeader("Authorization", "Bearer " + token);
+
+        // [옵션 2] JSON 바디로 응답
+        response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_OK);
+
+        String json = String.format("""
+        {
+            "status": 200,
+            "message": "로그인 성공",
+            "token": "%s",
+            "userId": %d
+        }
+        """, token, userId);
+
+        response.getWriter().write(json);
     }
 
     //로그인 실패시 실행하는 메소드

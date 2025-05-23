@@ -52,18 +52,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
-                    CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(clientUrlList);
-                    configuration.setAllowedMethods(Collections.singletonList("*"));
-                    configuration.setAllowCredentials(true);
-                    configuration.setAllowedHeaders(Collections.singletonList("*"));
-                    configuration.setMaxAge(3600L);
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
 
-                    configuration.setExposedHeaders(Collections.singletonList("Set-Cookie"));
-                    configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+                    // 전체 Origin 허용
+                    config.addAllowedOriginPattern("*");   // 혹은 config.setAllowedOriginPatterns(List.of("*"));
 
-                    return configuration;
+                    // 허용 HTTP 메서드 (필요 시 조정)
+                    config.setAllowedMethods(
+                            List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+
+                    // 모든 헤더 허용
+                    config.setAllowedHeaders(List.of("*"));
+
+                    // 자격 증명 포함 허용
+                    config.setAllowCredentials(true);
+
+                    // pre-flight 결과 캐싱 시간(초)
+                    config.setMaxAge(3600L);
+
+                    // Authorization 헤더 클라이언트에서 노출 허용 👇
+                    config.setExposedHeaders(List.of("Authorization"));
+
+                    return config;
                 }));
 
         // 인증 오류 핸들링 추가(JWT 만료)

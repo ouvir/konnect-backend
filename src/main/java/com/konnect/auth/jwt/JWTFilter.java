@@ -28,57 +28,44 @@ public class JWTFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain
     ) throws ServletException, IOException {
-        String authorization = null;
-        Cookie[] cookies = request.getCookies();
-        if(cookies == null) {
+        // 1️⃣ 헤더에서 Authorization 추출
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            log.debug("Authorization 헤더가 없거나 형식이 잘못됨");
             filterChain.doFilter(request, response);
             return;
         }
 
-        for (Cookie cookie : cookies) {
-            log.debug("Cookie: {}", cookie);
-            if (cookie.getName().equals("Authorization")) {
-                authorization = cookie.getValue();
-            }
-        }
+        // 2️⃣ JWT 추출
+        String token = authorizationHeader.substring(7); // "Bearer " 이후 토큰
 
-        // Authorization Header 검증
-        if (authorization == null) {
-            log.debug("token null");
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // Token
-        String token = authorization;
-
-        // Token ExpiredTime 검증
+        // 3️⃣ 토큰 만료 여부 확인
         if (jwtUtil.isExpired(token)) {
             throw new ExpiredJwtException(null, null, "JWT expired");
         }
 
-        // get username & role from Token
+        // 4️⃣ 토큰에서 사용자 정보 추출
         Long userId = jwtUtil.getUserId(token);
         String role = jwtUtil.getRole(token);
 
-        // init userDTO
         UserDTO userDTO = UserDTO.builder()
                 .userId(userId)
                 .role(role)
                 .build();
 
-        // put userDTO to UserDetails
         CustomUserPrincipal customUserPrincipal = new CustomUserPrincipal(userDTO);
 
-        // security 인증 토큰 생성
+        // 5️⃣ Security 인증 정보 등록
         Authentication authToken = new UsernamePasswordAuthenticationToken(
                 customUserPrincipal,
                 null,
                 customUserPrincipal.getAuthorities()
         );
 
-        // 세션에 사용자 등록
         SecurityContextHolder.getContext().setAuthentication(authToken);
+
         filterChain.doFilter(request, response);
     }
+
 }

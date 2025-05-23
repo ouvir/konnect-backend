@@ -28,51 +28,87 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private static final String REDIRECT_COOKIE = "OAUTH2_REDIRECT_URI";
 
+//    @Override
+//    public void onAuthenticationSuccess(HttpServletRequest request,
+//                                        HttpServletResponse response,
+//                                        Authentication authentication
+//    ) throws IOException, ServletException {
+//
+//        //OAuth2User
+//        CustomUserPrincipal customUserDetails = (CustomUserPrincipal) authentication.getPrincipal();
+//
+//        Long userId = customUserDetails.getId();
+//
+//        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+//        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
+//        GrantedAuthority auth = iterator.next();
+//        String role = auth.getAuthority();
+//
+//        String token = jwtUtil.createJwt(userId, role);
+//
+//        // JWT Cookie에 담아 전달
+//        response.addCookie(jwtUtil.createCookie("Authorization", token));
+//
+//        // redirect_uri 쿠키에서 값 얻기
+//        String redirectUri = getRedirectURL(request, response);
+//        response.sendRedirect(redirectUri);
+//    }
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication
     ) throws IOException, ServletException {
 
-        //OAuth2User
+        // 사용자 정보
         CustomUserPrincipal customUserDetails = (CustomUserPrincipal) authentication.getPrincipal();
-
         Long userId = customUserDetails.getId();
+        String role = authentication.getAuthorities().iterator().next().getAuthority();
 
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-        GrantedAuthority auth = iterator.next();
-        String role = auth.getAuthority();
-
+        // JWT 생성
         String token = jwtUtil.createJwt(userId, role);
 
-        // JWT Cookie에 담아 전달
-        response.addCookie(jwtUtil.createCookie("Authorization", token));
+        // 1️⃣ [선택] Set-Cookie 방식
+//        response.addCookie(jwtUtil.createCookie("Authorization", token));
 
-        // redirect_uri 쿠키에서 값 얻기
-        String redirectUri = getRedirectURL(request, response);
-        response.sendRedirect(redirectUri);
-    }
+        // 2️⃣ [선택] Authorization 헤더 방식
+        response.setHeader("Authorization", "Bearer " + token);
 
-    private String getRedirectURL(HttpServletRequest request, HttpServletResponse response) {
-        String redirectUri = "http://localhost:8080";
+        // 3️⃣ [선택] JSON 응답 방식
+        response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(HttpServletResponse.SC_OK);
 
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if (REDIRECT_COOKIE.equals(cookie.getName())) {
-                    redirectUri = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
-                    // 화이트리스트 검증
-                    if (clientUrlList.stream().noneMatch(redirectUri::startsWith)) {
-                        redirectUri = "http://localhost:8080/error";
-                    }
-                    cookie.setPath("/");
-                    cookie.setMaxAge(0);
-                    response.addCookie(cookie);
-                    break;
-                }
-            }
+        String json = String.format("""
+        {
+          "status": 200,
+          "message": "로그인 성공",
+          "token": "%s",
+          "userId": %d
         }
-        return redirectUri;
+        """, token, userId);
+
+        response.getWriter().write(json);
     }
+
+//    private String getRedirectURL(HttpServletRequest request, HttpServletResponse response) {
+//        String redirectUri = "http://localhost:8080";
+//
+//        if (request.getCookies() != null) {
+//            for (Cookie cookie : request.getCookies()) {
+//                if (REDIRECT_COOKIE.equals(cookie.getName())) {
+//                    redirectUri = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
+//                    // 화이트리스트 검증
+//                    if (clientUrlList.stream().noneMatch(redirectUri::startsWith)) {
+//                        redirectUri = "http://localhost:8080/error";
+//                    }
+//                    cookie.setPath("/");
+//                    cookie.setMaxAge(0);
+//                    response.addCookie(cookie);
+//                    break;
+//                }
+//            }
+//        }
+//        return redirectUri;
+//    }
 
 }
