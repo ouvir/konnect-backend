@@ -70,7 +70,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String token = jwtUtil.createJwt(userId, role);
 
         // [옵션 1] Authorization 헤더에 담기
-        response.setHeader("Authorization", "Bearer " + token);
+        response.setHeader("Authorization", "Bearer" + token);
 
         // [옵션 2] JSON 바디로 응답
         response.setContentType("application/json;charset=UTF-8");

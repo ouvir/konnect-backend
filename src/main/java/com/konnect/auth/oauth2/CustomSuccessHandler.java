@@ -33,8 +33,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                                         HttpServletResponse response,
                                         Authentication authentication
     ) throws IOException, ServletException {
-
-        //OAuth2User
         CustomUserPrincipal customUserDetails = (CustomUserPrincipal) authentication.getPrincipal();
 
         Long userId = customUserDetails.getId();
@@ -45,34 +43,32 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String role = auth.getAuthority();
 
         String token = jwtUtil.createJwt(userId, role);
-
-        // JWT Cookie에 담아 전달
-        response.addCookie(jwtUtil.createCookie("Authorization", "Bearer " + token));
-
         // redirect_uri 쿠키에서 값 얻기
-        String redirectUri = getRedirectURL(request, response);
-        response.sendRedirect(redirectUri);
+        String redirectUrl = "http://localhost:5173/list?Authorization=Bearer" + token;
+
+        getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 
-    private String getRedirectURL(HttpServletRequest request, HttpServletResponse response) {
-        String redirectUri = "http://localhost:8080";
-
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if (REDIRECT_COOKIE.equals(cookie.getName())) {
-                    redirectUri = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
-//                    // 화이트리스트 검증
-//                    if (clientUrlList.stream().noneMatch(redirectUri::startsWith)) {
-//                        redirectUri = "http://localhost:8080/error";
-//                    }
-                    cookie.setPath("/");
-                    cookie.setMaxAge(0);
-                    response.addCookie(cookie);
-                    break;
-                }
-            }
-        }
-        return redirectUri;
-    }
+//    private String getRedirectURL(HttpServletRequest request, HttpServletResponse response) {
+//        // TODO 쿠키 문제 해결
+//        String redirectUri = "http://localhost:5173/list";
+//
+//        if (request.getCookies() != null) {
+//            for (Cookie cookie : request.getCookies()) {
+//                if (REDIRECT_COOKIE.equals(cookie.getName())) {
+//                    redirectUri = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
+////                    // 화이트리스트 검증
+////                    if (clientUrlList.stream().noneMatch(redirectUri::startsWith)) {
+////                        redirectUri = "http://localhost:8080/error";
+////                    }
+//                    cookie.setPath("/");
+//                    cookie.setMaxAge(0);
+//                    response.addCookie(cookie);
+//                    break;
+//                }
+//            }
+//        }
+//        return redirectUri;
+//    }
 
 }

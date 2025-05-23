@@ -31,14 +31,14 @@ public class JWTFilter extends OncePerRequestFilter {
         // 1️⃣ 헤더에서 Authorization 추출
         String authorizationHeader = request.getHeader("Authorization");
 
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer")) {
             log.debug("Authorization 헤더가 없거나 형식이 잘못됨");
             filterChain.doFilter(request, response);
             return;
         }
 
         // 2️⃣ JWT 추출
-        String token = authorizationHeader.substring(7); // "Bearer " 이후 토큰
+        String token = authorizationHeader.substring(6); // "Bearer" 이후 토큰
 
         // 3️⃣ 토큰 만료 여부 확인
         if (jwtUtil.isExpired(token)) {

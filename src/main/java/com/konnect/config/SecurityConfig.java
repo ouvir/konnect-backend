@@ -65,14 +65,14 @@ public class SecurityConfig {
                     // 모든 헤더 허용
                     config.setAllowedHeaders(List.of("*"));
 
+                    // 쿠키·Authorization 헤더 노출
+                    config.setExposedHeaders(List.of("Set-Cookie", "Authorization"));
+
                     // 자격 증명 포함 허용
                     config.setAllowCredentials(true);
 
                     // pre-flight 결과 캐싱 시간(초)
                     config.setMaxAge(3600L);
-
-                    // Authorization 헤더 클라이언트에서 노출 허용 👇
-                    config.setExposedHeaders(List.of("Authorization"));
 
                     return config;
                 }));
