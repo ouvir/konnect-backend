@@ -29,7 +29,6 @@ public class DiaryController implements DiaryAPI {
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
         requestDTO.setUserId(userDetails.getId());
-        System.out.println(requestDTO.getUserId());
         CreateDiaryResponseDTO dto =
                 diaryService.createDiaryDraft(requestDTO, thumbnail, imageFiles);
         HttpStatus status = dto.getDiaryId() == null ? HttpStatus.CREATED : HttpStatus.OK;
@@ -77,7 +76,6 @@ public class DiaryController implements DiaryAPI {
             @PathVariable Long diaryId,
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
-        System.out.println("api called: " + userDetails.getId());
         DetailDiaryDTO dto = diaryService.fetchDiaryDetail(diaryId, userDetails.getId());
         return ResponseEntity.ok(dto);
     }
