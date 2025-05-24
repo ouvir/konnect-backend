@@ -4,6 +4,7 @@ package com.konnect.tag;
 import com.konnect.tag.dto.TagDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,9 @@ public class TagService {
         // CallResponseSpec
         String answer = res.content();
 
+        // Access the usage information
+        Usage usage = res.chatResponse().getMetadata().getUsage();
+
         /* 3. 태그 이름 파싱 */
         Set<String> parsed = SPLIT.splitAsStream(answer)
                 .map(String::trim)
@@ -60,7 +64,9 @@ public class TagService {
 
         /* 5. DTO 변환 */
         return tags.stream()
-                .map(t -> new TagDto(t.getTagId(), t.getName(), t.getNameEng()))
+                .map(t -> new TagDto(
+                        t.getTagId(), t.getName(), t.getNameEng(),
+                        usage.getPromptTokens(), usage.getCompletionTokens(), usage.getTotalTokens()))
                 .toList();
     }
 }

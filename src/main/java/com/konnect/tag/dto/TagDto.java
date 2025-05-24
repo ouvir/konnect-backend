@@ -18,4 +18,13 @@ public class TagDto {
 
     @Schema(description = "태그 영문 이름", example = "healing")
     private String nameEng;
+
+    @Schema(description = "Prompt Tokens", example = "12333")
+    private Integer promptToken;
+
+    @Schema(description = "Completion Tokens", example = "12333")
+    private Integer completionToken;
+
+    @Schema(description = "Total Tokens", example = "12333")
+    private Integer totalToken;
 }
