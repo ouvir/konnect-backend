@@ -80,10 +80,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         {
             "status": 200,
             "message": "로그인 성공",
-            "token": "%s",
             "userId": %d
         }
-        """, token, userId);
+        """, userId);
 
         response.getWriter().write(json);
     }
