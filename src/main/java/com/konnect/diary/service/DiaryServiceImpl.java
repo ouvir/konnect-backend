@@ -1,9 +1,12 @@
 package com.konnect.diary.service;
 
 import com.konnect.auth.dto.TagResponseDTO;
+import com.konnect.comment.CommentRepository;
+import com.konnect.comment.dto.CommentDto;
 import com.konnect.diary.dto.*;
 import com.konnect.diary.entity.DiaryEntity;
 import com.konnect.diary.entity.DiaryTagEntity;
+import com.konnect.diary.repository.DetailDiaryProjection;
 import com.konnect.diary.repository.DiaryRepository;
 import com.konnect.diary.repository.DiaryTagRepository;
 import com.konnect.diary.repository.ListDiaryProjection;
@@ -12,6 +15,7 @@ import com.konnect.entity.TagEntity;
 import com.konnect.repository.AreaRepository;
 import com.konnect.repository.TagRepository;
 import com.konnect.user.repository.UserRepository;
+import com.konnect.util.DateTimeUtils;
 import com.konnect.util.FileStorage;
 import com.konnect.util.ImageManager;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +46,7 @@ public class DiaryServiceImpl implements DiaryService {
 
     private final ImageManager imageManager;
     private final FileStorage fileStorage;
+    private final CommentRepository commentRepository;
 
     @Override
     @Transactional
@@ -78,6 +83,37 @@ public class DiaryServiceImpl implements DiaryService {
         );
         Page<ListDiaryProjection> pages = diaryRepository.fetchMyDiaries(userId, pageable);
         return toResponseList(pages);
+    }
+
+    @Override
+    public DetailDiaryDTO fetchDiaryDetail(Long diaryId, Long userId) {
+        if (!diaryRepository.existsById(diaryId))
+            throw new DiaryRuntimeException("cannot find diary with id: " + diaryId);
+
+        DetailDiaryProjection projection = diaryRepository.fetchDiaryDetail(diaryId, userId);
+        List<TagResponseDTO> tags = diaryTagRepository
+                .findTop3ByDiary_DiaryIdOrderByIdAsc(diaryId)
+                .stream()
+                .map(t -> new TagResponseDTO(t.getTagId(), t.getName()))
+                .toList();
+        List<CommentDto> comments = commentRepository
+                .findByDiaryIdAndParentIsNullAndIsDeletedFalseOrderByCreatedAtAsc(diaryId)
+                .stream()
+                .map(CommentDto::from)
+                .toList();
+
+        return DetailDiaryDTO.from(projection, tags, comments);
+    }
+
+    private void createDraft(
+            CreateDiaryDraftRequestDTO dto,
+            MultipartFile thumbnail,
+            List<MultipartFile> imageFiles
+    ) {
+        DiaryEntity diary = new DiaryEntity();
+        diary.setTitle(dto.getTitle());
+        diary.setUser(userRepository.getReferenceById(dto.getUserId()));
+        diary.setContent(dto.getContent().orElse(null));
     }
 
     // ———————————— 헬퍼 1: Pageable 생성 분리
@@ -163,6 +199,7 @@ public class DiaryServiceImpl implements DiaryService {
         diary.setEndDate(dto.getEndDate().orElse(null));
         String status = publish ? "published" : "editing";
         diary.setStatus(status);
+        diary.setCreatedAt(DateTimeUtils.getNowDateString());
         diary = diaryRepository.save(diary);
         syncTags(diary, dto.getTags());
 
@@ -178,7 +215,7 @@ public class DiaryServiceImpl implements DiaryService {
         if (publish) {
             validateForPublish(diary, thumbnail, imageFiles);
             diary.setStatus("published");
-            diary.setCreatedAt(LocalDateTime.now());
+            diary.setCreatedAt(DateTimeUtils.getNowDateString());
             diary = diaryRepository.save(diary);
         }
 

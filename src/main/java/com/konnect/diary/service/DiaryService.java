@@ -1,11 +1,6 @@
 package com.konnect.diary.service;
 
-import com.konnect.diary.dto.CreateDiaryDraftRequestDTO;
-import com.konnect.diary.dto.CreateDiaryResponseDTO;
-//import com.konnect.dto.ListDiaryResponseDTO;
-import com.konnect.diary.dto.DiarySortType;
-import com.konnect.diary.dto.ListDiaryResponseDTO;
-import org.springframework.data.jpa.repository.Query;
+import com.konnect.diary.dto.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -26,4 +21,6 @@ public interface DiaryService {
     List<ListDiaryResponseDTO> fetchDiaries(Long areaId, boolean topOnly, DiarySortType sortedBy);
 
     List<ListDiaryResponseDTO> fetchMyDiaries(Long userId);
+
+    DetailDiaryDTO fetchDiaryDetail(Long diaryId, Long userId);
 }

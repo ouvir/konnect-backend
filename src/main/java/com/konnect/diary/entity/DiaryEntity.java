@@ -1,5 +1,6 @@
 package com.konnect.diary.entity;
 
+import com.konnect.diary.dto.CreateDiaryDraftRequestDTO;
 import com.konnect.entity.AreaEntity;
 import com.konnect.user.entity.UserEntity;
 import jakarta.persistence.*;
@@ -46,14 +47,8 @@ public class DiaryEntity {
     @Column(nullable = false)
     private String status;
 
-    @Column(
-            name = "created_at",
-            nullable = false,
-            insertable = false,
-            updatable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
-    )
-    private LocalDateTime createdAt;
+    @Column(name = "created_at")
+    private String createdAt;
 
     // TODO: 여행 루트 컬럼 추가 예정
 

@@ -1,10 +1,7 @@
 package com.konnect.diary.controller;
 
 import com.konnect.auth.dto.CustomUserPrincipal;
-import com.konnect.diary.dto.CreateDiaryDraftRequestDTO;
-import com.konnect.diary.dto.CreateDiaryResponseDTO;
-import com.konnect.diary.dto.DiarySortType;
-import com.konnect.diary.dto.ListDiaryResponseDTO;
+import com.konnect.diary.dto.*;
 import com.konnect.diary.service.DiaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,8 +28,8 @@ public class DiaryController implements DiaryAPI {
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
-
         requestDTO.setUserId(userDetails.getId());
+        System.out.println(requestDTO.getUserId());
         CreateDiaryResponseDTO dto =
                 diaryService.createDiaryDraft(requestDTO, thumbnail, imageFiles);
         HttpStatus status = dto.getDiaryId() == null ? HttpStatus.CREATED : HttpStatus.OK;
@@ -75,4 +72,13 @@ public class DiaryController implements DiaryAPI {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/user/diaries/{diaryId}")
+    public ResponseEntity<DetailDiaryDTO> fetchDiaryById(
+            @PathVariable Long diaryId,
+            @AuthenticationPrincipal CustomUserPrincipal userDetails
+    ) {
+        System.out.println("api called: " + userDetails.getId());
+        DetailDiaryDTO dto = diaryService.fetchDiaryDetail(diaryId, userDetails.getId());
+        return ResponseEntity.ok(dto);
+    }
 }
