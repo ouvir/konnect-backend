@@ -25,7 +25,8 @@ public class UserController {
     public ResponseEntity<UserDTO> myInfo(
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
-        UserDTO userInfo = userService.findById(userDetails.getId());
+        // TODO userDetails.getId()의 3항연산자 모두 삭제
+        UserDTO userInfo = userService.findById(userDetails == null ? 1 : userDetails.getId());
         return ResponseEntity.ok(userInfo);
     }
 

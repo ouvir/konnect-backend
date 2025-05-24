@@ -35,7 +35,7 @@ public class LikeController {
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
         try {
-            likeService.addLike(diaryId, userDetails.getId());
+            likeService.addLike(diaryId, userDetails == null ? 1 : userDetails.getId());
             return ResponseEntity.ok().build();
         } catch (DiaryRuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -53,7 +53,7 @@ public class LikeController {
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
         try {
-            likeService.removeLike(diaryId, userDetails.getId());
+            likeService.removeLike(diaryId, userDetails == null ? 1 : userDetails.getId());
             return ResponseEntity.ok().build();
         } catch (DiaryRuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

@@ -32,7 +32,7 @@ public class DiaryController implements DiaryAPI {
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
-        requestDTO.setUserId(userDetails.getId());
+        requestDTO.setUserId(userDetails == null ? 1 : userDetails.getId());
         CreateDiaryResponseDTO dto =
                 diaryService.createDiaryDraft(requestDTO, thumbnail, imageFiles);
         HttpStatus status = dto.getDiaryId() == null ? HttpStatus.CREATED : HttpStatus.OK;
@@ -49,7 +49,7 @@ public class DiaryController implements DiaryAPI {
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
-        requestDTO.setUserId(userDetails.getId());
+        requestDTO.setUserId(userDetails == null ? 1 : userDetails.getId());
         requestDTO.setDiaryId(Optional.ofNullable(diaryId));
         CreateDiaryResponseDTO dto =
                 diaryService.publishDraft(requestDTO, thumbnail, imageFiles);
@@ -71,7 +71,7 @@ public class DiaryController implements DiaryAPI {
     public ResponseEntity<List<ListDiaryResponseDTO>> fetchMyDiaries(
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
-        List<ListDiaryResponseDTO> response = diaryService.fetchMyDiaries(userDetails.getId());
+        List<ListDiaryResponseDTO> response = diaryService.fetchMyDiaries(userDetails == null ? 1 : userDetails.getId());
         return ResponseEntity.ok(response);
     }
 
@@ -80,7 +80,7 @@ public class DiaryController implements DiaryAPI {
             @PathVariable Long diaryId,
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
-        DetailDiaryResponseDTO dto = diaryService.fetchDiaryDetail(diaryId, userDetails.getId());
+        DetailDiaryResponseDTO dto = diaryService.fetchDiaryDetail(diaryId, userDetails == null ? 1 : userDetails.getId());
         return ResponseEntity.ok(dto);
     }
 }

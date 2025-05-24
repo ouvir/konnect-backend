@@ -35,10 +35,12 @@ public class TagService {
         String prompt = PromptBuilder.buildPrompt(tagNames, content);
 
         /* 2. GPT 호출 → 한 줄로 응답 문자열 */
-        String answer = chatClient.prompt()
+        ChatClient.CallResponseSpec res = chatClient.prompt()
                 .user(prompt)
-                .call()     // CallResponseSpec
-                .content(); // => String
+                .call();
+
+        // CallResponseSpec
+        String answer = res.content();
 
         /* 3. 태그 이름 파싱 */
         Set<String> parsed = SPLIT.splitAsStream(answer)
