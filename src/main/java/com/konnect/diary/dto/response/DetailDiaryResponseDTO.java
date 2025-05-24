@@ -1,5 +1,6 @@
 package com.konnect.diary.dto.response;
 
+import com.konnect.diary.dto.request.DiaryRouteDTO;
 import com.konnect.tag.TagResponseDTO;
 import com.konnect.comment.dto.CommentDto;
 import com.konnect.diary.repository.DetailDiaryProjection;
@@ -24,11 +25,13 @@ public class DetailDiaryResponseDTO {
     private String startDate;
     private String endDate;
     private List<TagResponseDTO> tags = new ArrayList<>();
+    private List<DiaryRouteDTO> routes = new ArrayList<>();
     private List<CommentDto> comments = new ArrayList<>();
 
     public static DetailDiaryResponseDTO from(
             DetailDiaryProjection projection,
             List<TagResponseDTO> tags,
+            List<DiaryRouteDTO> routes,
             List<CommentDto> comments
     ) {
         DetailDiaryResponseDTO detailDiaryResponseDTO = new DetailDiaryResponseDTO();
@@ -40,6 +43,7 @@ public class DetailDiaryResponseDTO {
         detailDiaryResponseDTO.setStartDate(projection.getStartDate());
         detailDiaryResponseDTO.setEndDate(projection.getEndDate());
         detailDiaryResponseDTO.setTags(tags);
+        detailDiaryResponseDTO.setRoutes(routes);
         detailDiaryResponseDTO.setComments(comments);
         return detailDiaryResponseDTO;
     }

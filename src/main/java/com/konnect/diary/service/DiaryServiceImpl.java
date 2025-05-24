@@ -1,9 +1,9 @@
 package com.konnect.diary.service;
 
-import com.konnect.attraction.repository.AttractionRepository;
+import java.util.LinkedHashMap;
 import com.konnect.comment.CommentRepository;
 import com.konnect.comment.dto.CommentDto;
-import com.konnect.diary.dto.*;
+import com.konnect.diary.dto.DiarySortType;
 import com.konnect.diary.dto.request.AreaRequestDTO;
 import com.konnect.diary.dto.request.CreateDiaryDraftRequestDTO;
 import com.konnect.diary.dto.request.DiaryRouteDTO;
@@ -19,7 +19,6 @@ import com.konnect.diary.repository.DiaryTagRepository;
 import com.konnect.diary.repository.ListDiaryProjection;
 import com.konnect.diary.service.exception.DiaryRuntimeException;
 import com.konnect.repository.AreaRepository;
-import com.konnect.route.dto.RouteDetailResponse;
 import com.konnect.route.entity.Route;
 import com.konnect.route.repository.RouteRepository;
 import com.konnect.tag.TagEntity;
@@ -42,6 +41,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,7 +54,6 @@ public class DiaryServiceImpl implements DiaryService {
     private final AreaRepository areaRepository;
     private final UserRepository userRepository;
     private final RouteRepository routeRepository;
-    private final AttractionRepository attractionRepository;
 
     private final ImageManager imageManager;
     private final FileStorage fileStorage;
@@ -109,13 +108,49 @@ public class DiaryServiceImpl implements DiaryService {
                 .stream()
                 .map(t -> new TagResponseDTO(t.getTagId(), t.getName()))
                 .toList();
+        List<DiaryRouteDTO> routeDtos = fetchRoutes(diaryId);
         List<CommentDto> comments = commentRepository
                 .findByDiaryIdAndParentIsNullAndIsDeletedFalseOrderByCreatedAtAsc(diaryId)
                 .stream()
                 .map(CommentDto::from)
                 .toList();
 
-        return DetailDiaryResponseDTO.from(projection, tags, comments);
+        return DetailDiaryResponseDTO.from(projection, tags, routeDtos, comments);
+    }
+
+    private List<DiaryRouteDTO> fetchRoutes(Long diaryId) {
+        List<Route> routeEntities = routeRepository
+                .findAllByDiary_DiaryIdOrderByVisitedDateAscVisitedTimeAsc(diaryId);
+
+        Map<String, List<Route>> grouped = routeEntities.stream()
+                .collect(Collectors.groupingBy(
+                        Route::getVisitedDate,
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ));
+
+        List<DiaryRouteDTO> dtos = grouped.entrySet().stream()
+                .map(entry -> {
+                    String date = entry.getKey();
+                    List<DiaryRouteDetailDTO> details = entry.getValue().stream()
+                            .map(r -> {
+                                DiaryRouteDetailDTO detail = DiaryRouteDetailDTO.builder()
+                                        .visitedDate(r.getVisitedDate())
+                                        .visitedTime(r.getVisitedTime())
+                                        .distance(r.getDistance())
+                                        .title(r.getTitle())
+                                        .latitude(r.getLatitude())
+                                        .longitude(r.getLongitude())
+                                        .build();
+                                return detail;
+                            })
+                            .toList();
+
+                    return new DiaryRouteDTO(date, details);                        // date + items
+                })
+                .toList();
+
+        return dtos;
     }
 
     private Pageable createPageable(boolean topOnly, DiarySortType sortType) {

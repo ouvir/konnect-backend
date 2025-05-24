@@ -60,15 +60,13 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
         d.content            AS content,
         FUNCTION('DATE_FORMAT', d.startDate, '%Y-%m-%d %H:%i:%s') AS startDate,
         FUNCTION('DATE_FORMAT', d.endDate,   '%Y-%m-%d %H:%i:%s') AS endDate,
-        CASE 
-          WHEN SUM(CASE WHEN l.user.userId = :userId AND l.isDeleted = FALSE THEN 1 ELSE 0 END) > 0
-          THEN TRUE ELSE FALSE
-        END AS isUserLiked
+        CASE WHEN COUNT(l) > 0 THEN TRUE ELSE FALSE END   AS isUserLiked
       FROM DiaryEntity d
       LEFT JOIN LikeEntity l
         ON l.isDeleted = FALSE
+        AND l.user.userId = :userId
+        AND l.isDeleted = FALSE
       WHERE d.diaryId = :diaryId
-      GROUP BY d.diaryId, d.user.name, d.title, d.content, d.startDate, d.endDate
       """)
     DetailDiaryProjection fetchDiaryDetail(
             @Param("diaryId") Long diaryId,
