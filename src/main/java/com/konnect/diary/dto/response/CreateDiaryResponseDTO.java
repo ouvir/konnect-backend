@@ -1,5 +1,7 @@
-package com.konnect.diary.dto;
+package com.konnect.diary.dto.response;
 
+import com.konnect.diary.dto.request.DiaryRouteDTO;
+import com.konnect.route.dto.RouteDetailResponse;
 import com.konnect.tag.TagResponseDTO;
 import com.konnect.diary.entity.DiaryEntity;
 import com.konnect.diary.entity.DiaryTagEntity;
@@ -23,11 +25,12 @@ public class CreateDiaryResponseDTO {
     private String startDate;
     private String endDate;
     private List<TagResponseDTO> tags;
+    private List<DiaryRouteDTO> routes;
 
     private String thumbnailImage;
     private List<String> images;
 
-    public static CreateDiaryResponseDTO from(DiaryEntity diary, String thumbnailImage, List<String> images) {
+    public static CreateDiaryResponseDTO from(DiaryEntity diary, String thumbnailImage, List<String> images, List<DiaryRouteDTO> routes) {
         List<TagResponseDTO> tagResponses = new ArrayList<>();
         for (DiaryTagEntity diaryTag : diary.getTags()) {
             tagResponses.add(TagResponseDTO.from(diaryTag.getTag()));
@@ -41,6 +44,7 @@ public class CreateDiaryResponseDTO {
                 diary.getStartDate(),
                 diary.getEndDate(),
                 tagResponses,
+                routes,
                 thumbnailImage,
                 images
         );

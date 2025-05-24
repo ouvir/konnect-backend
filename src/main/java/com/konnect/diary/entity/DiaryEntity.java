@@ -1,12 +1,10 @@
 package com.konnect.diary.entity;
 
-import com.konnect.diary.dto.CreateDiaryDraftRequestDTO;
 import com.konnect.entity.AreaEntity;
 import com.konnect.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
