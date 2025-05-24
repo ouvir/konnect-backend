@@ -10,9 +10,6 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,109 +18,64 @@ public class RouteRepositoryImpl implements RouteRepositoryCustom {
 
     private final JPAQueryFactory query;
 
-    @Override
-    public int nextOrderIdx(Long diaryId, Integer visitedAt) {
-        QRoute route = QRoute.route;
-        Integer max = query.select(route.orderIdx.max())
-                .from(route)
-                .where(route.diary.diaryId.eq(diaryId).and(route.visitedAt.eq(visitedAt)))
-                .fetchOne();
-        return max == null ? 1 : max + 1;
-    }
-
+    /* AttractionDTO 서브-프로젝션 재사용 */
     private Expression<AttractionDTO> attractionProjection(QAttraction a) {
-        // AttractionDTO(생성자) 파라미터 순서는 클래스 생성자와 동일해야 합니다.
         return Projections.constructor(AttractionDTO.class,
-                a.no,
-                a.contentId,
-                a.title,
-                a.contentType.contentTypeId,
-                a.contentType.contentTypeName,
-                a.sido.sidoCode,
-                a.sido.sidoName,
-                a.gugun.gugunCode,
-                a.gugun.gugunName,
-                a.firstImage1,
-                a.firstImage2,
-                a.mapLevel,
-                a.latitude,
-                a.longitude,
-                a.tel,
-                a.addr1,
-                a.addr2,
-                a.homepage,
-                a.overview
+                a.no, a.contentId, a.title, a.titleEng,
+                a.contentType.contentTypeId, a.contentType.contentTypeName, a.contentType.contentTypeNameEng,
+                a.sido.sidoCode, a.sido.sidoName, a.sido.sidoNameEng,
+                a.gugun.gugunCode, a.gugun.gugunName, a.gugun.gugunNameEng,
+                a.firstImage1, a.firstImage2, a.mapLevel,
+                a.latitude, a.longitude, a.tel,
+                a.addr1, a.addr2, a.homepage, a.overview, a.overviewEng
         );
     }
 
+    /* -------- 목록 조회 -------- */
     @Override
-    public List<RouteDetailResponse> searchByDiary(Long diaryId, SearchCondition condition) {
+    public List<RouteDetailResponse> searchByDiary(Long diaryId, SearchCondition cond) {
         QRoute r = QRoute.route;
         QAttraction a = QAttraction.attraction;
 
-        BooleanBuilder where = new BooleanBuilder();
-        where.and(r.diary.diaryId.eq(diaryId));
+        BooleanBuilder where = new BooleanBuilder()
+                .and(r.diary.diaryId.eq(diaryId));
 
-        if (condition.has("visitedAt")) {
-            Integer visitedAt = Integer.parseInt(condition.get("visitedAt"));
-            where.and(r.visitedAt.eq(visitedAt));
+        if (cond.has("visitedDate")) {
+            where.and(r.visitedDate.eq(cond.get("visitedDate")));
         }
 
         return query
                 .select(Projections.constructor(RouteDetailResponse.class,
                         r.id,
-                        r.orderIdx,
-                        r.visitedAt,
+                        r.visitedDate,
+                        r.visitedTime,
                         r.distance,
                         attractionProjection(a)
                 ))
                 .from(r)
                 .join(r.attraction, a)
                 .where(where)
-                .orderBy(r.orderIdx.asc())
+                .orderBy(r.visitedDate.asc(), r.visitedTime.asc())
                 .fetch();
     }
 
-    /** Route + Attraction 을 DTO 로 즉시 매핑 */
+    /* -------- 단일 상세 -------- */
     @Override
     public Optional<RouteDetailResponse> findDetailById(Long routeId) {
-        QAttraction attraction = QAttraction.attraction;
-        QRoute route = QRoute.route;
-
-        // AttractionDTO 서브-프로젝션
-        var attractionDto = Projections.fields(
-                AttractionDTO.class,
-                attraction.no,
-                attraction.contentId,
-                attraction.title,
-                attraction.contentType.contentTypeId.as("contentTypeId"),
-                attraction.contentType.contentTypeName.as("contentTypeName"),
-                attraction.sido.sidoCode.as("areaCode"),
-                attraction.sido.sidoName.as("sidoName"),
-                attraction.gugun.gugunCode.as("gugunCode"),
-                attraction.gugun.gugunName.as("gugunName"),
-                attraction.firstImage1,
-                attraction.firstImage2,
-                attraction.mapLevel,
-                attraction.latitude,
-                attraction.longitude,
-                attraction.tel,
-                attraction.addr1,
-                attraction.addr2
-        );
+        QRoute r = QRoute.route;
+        QAttraction a = QAttraction.attraction;
 
         RouteDetailResponse dto = query
-                .select(Projections.constructor(
-                        RouteDetailResponse.class,
-                        route.id,
-                        route.orderIdx,
-                        route.visitedAt,
-                        route.distance,          // ★ 추가
-                        attractionDto           // ← 서브 DTO
+                .select(Projections.constructor(RouteDetailResponse.class,
+                        r.id,
+                        r.visitedDate,
+                        r.visitedTime,
+                        r.distance,
+                        attractionProjection(a)
                 ))
-                .from(route)
-                .join(attraction).on(route.attraction.no.eq(attraction.no))
-                .where(route.id.eq(routeId))
+                .from(r)
+                .join(r.attraction, a)
+                .where(r.id.eq(routeId))
                 .fetchOne();
 
         return Optional.ofNullable(dto);
