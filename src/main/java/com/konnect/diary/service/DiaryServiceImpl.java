@@ -4,6 +4,13 @@ import com.konnect.attraction.repository.AttractionRepository;
 import com.konnect.comment.CommentRepository;
 import com.konnect.comment.dto.CommentDto;
 import com.konnect.diary.dto.*;
+import com.konnect.diary.dto.request.AreaRequestDTO;
+import com.konnect.diary.dto.request.CreateDiaryDraftRequestDTO;
+import com.konnect.diary.dto.request.DiaryRouteDTO;
+import com.konnect.diary.dto.request.DiaryRouteDetailDTO;
+import com.konnect.diary.dto.response.CreateDiaryResponseDTO;
+import com.konnect.diary.dto.response.DetailDiaryResponseDTO;
+import com.konnect.diary.dto.response.ListDiaryResponseDTO;
 import com.konnect.diary.entity.DiaryEntity;
 import com.konnect.diary.entity.DiaryTagEntity;
 import com.konnect.diary.repository.DetailDiaryProjection;
@@ -12,6 +19,7 @@ import com.konnect.diary.repository.DiaryTagRepository;
 import com.konnect.diary.repository.ListDiaryProjection;
 import com.konnect.diary.service.exception.DiaryRuntimeException;
 import com.konnect.repository.AreaRepository;
+import com.konnect.route.dto.RouteDetailResponse;
 import com.konnect.route.entity.Route;
 import com.konnect.route.repository.RouteRepository;
 import com.konnect.tag.TagEntity;
@@ -90,7 +98,7 @@ public class DiaryServiceImpl implements DiaryService {
     }
 
     @Override
-    public DetailDiaryDTO fetchDiaryDetail(Long diaryId, Long userId) {
+    public DetailDiaryResponseDTO fetchDiaryDetail(Long diaryId, Long userId) {
         if (!diaryRepository.existsById(diaryId))
             throw new DiaryRuntimeException("cannot find diary with id: " + diaryId);
 
@@ -106,7 +114,7 @@ public class DiaryServiceImpl implements DiaryService {
                 .map(CommentDto::from)
                 .toList();
 
-        return DetailDiaryDTO.from(projection, tags, comments);
+        return DetailDiaryResponseDTO.from(projection, tags, comments);
     }
 
     private Pageable createPageable(boolean topOnly, DiarySortType sortType) {
@@ -132,7 +140,7 @@ public class DiaryServiceImpl implements DiaryService {
                 .collect(Collectors.toList());
 
         String thumbnail = fileStorage.loadThumbnailBase64(p.getDiaryId());
-        AreaDTO area     = new AreaDTO(p.getAreaId(), p.getAreaName());
+        AreaRequestDTO area     = new AreaRequestDTO(p.getAreaId(), p.getAreaName());
 
         return ListDiaryResponseDTO.builder()
                 .diaryId(p.getDiaryId())
@@ -215,7 +223,7 @@ public class DiaryServiceImpl implements DiaryService {
                 .map(b -> "data:image/*;base64," + Base64.getEncoder().encodeToString(b))
                 .collect(Collectors.toList());
 
-        return CreateDiaryResponseDTO.from(diary, thumbBase64, imgsBase64);
+        return CreateDiaryResponseDTO.from(diary, thumbBase64, imgsBase64, dto.getRoutes());
     }
 
     private void syncTags(DiaryEntity diary, List<Long> tagIds) {
@@ -239,13 +247,13 @@ public class DiaryServiceImpl implements DiaryService {
         }
     }
 
-    private void syncRoutes(DiaryEntity diary, List<CreateDiaryRouteDTO> dayRoutes) {
+    private void syncRoutes(DiaryEntity diary, List<DiaryRouteDTO> dayRoutes) {
         routeRepository.deleteByDiaryDiaryId(diary.getDiaryId());
 
         List<Route> entities = new ArrayList<>();
-        for (CreateDiaryRouteDTO dayDto : dayRoutes) {
+        for (DiaryRouteDTO dayDto : dayRoutes) {
             String date = dayDto.getDate();
-            for (DiaryRouteDTO item : dayDto.getItems()) {
+            for (DiaryRouteDetailDTO item : dayDto.getItems()) {
                 Route route = Route.builder()
                         .attraction(attractionRepository.getReferenceById(item.getAttractionNo()))         // 명소코드
                         .diary(diary)

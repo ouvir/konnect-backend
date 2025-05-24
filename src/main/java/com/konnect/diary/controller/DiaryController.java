@@ -2,6 +2,10 @@ package com.konnect.diary.controller;
 
 import com.konnect.auth.dto.CustomUserPrincipal;
 import com.konnect.diary.dto.*;
+import com.konnect.diary.dto.request.CreateDiaryDraftRequestDTO;
+import com.konnect.diary.dto.response.CreateDiaryResponseDTO;
+import com.konnect.diary.dto.response.DetailDiaryResponseDTO;
+import com.konnect.diary.dto.response.ListDiaryResponseDTO;
 import com.konnect.diary.service.DiaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -72,11 +76,11 @@ public class DiaryController implements DiaryAPI {
     }
 
     @GetMapping("/user/diaries/{diaryId}")
-    public ResponseEntity<DetailDiaryDTO> fetchDiaryById(
+    public ResponseEntity<DetailDiaryResponseDTO> fetchDiaryById(
             @PathVariable Long diaryId,
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
-        DetailDiaryDTO dto = diaryService.fetchDiaryDetail(diaryId, userDetails.getId());
+        DetailDiaryResponseDTO dto = diaryService.fetchDiaryDetail(diaryId, userDetails.getId());
         return ResponseEntity.ok(dto);
     }
 }

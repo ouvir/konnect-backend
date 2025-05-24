@@ -1,10 +1,10 @@
 package com.konnect.diary.controller;
 
 import com.konnect.auth.dto.CustomUserPrincipal;
-import com.konnect.diary.dto.CreateDiaryDraftRequestDTO;
-import com.konnect.diary.dto.CreateDiaryResponseDTO;
+import com.konnect.diary.dto.request.CreateDiaryDraftRequestDTO;
+import com.konnect.diary.dto.response.CreateDiaryResponseDTO;
 import com.konnect.diary.dto.DiarySortType;
-import com.konnect.diary.dto.ListDiaryResponseDTO;
+import com.konnect.diary.dto.response.ListDiaryResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;

@@ -1,0 +1,46 @@
+package com.konnect.diary.dto.response;
+
+import com.konnect.tag.TagResponseDTO;
+import com.konnect.comment.dto.CommentDto;
+import com.konnect.diary.repository.DetailDiaryProjection;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class DetailDiaryResponseDTO {
+    private Long id;
+    private String title;
+    private String content;
+    private boolean isUserLiked;
+    private Integer likeCount;
+    private String startDate;
+    private String endDate;
+    private List<TagResponseDTO> tags = new ArrayList<>();
+    private List<CommentDto> comments = new ArrayList<>();
+
+    public static DetailDiaryResponseDTO from(
+            DetailDiaryProjection projection,
+            List<TagResponseDTO> tags,
+            List<CommentDto> comments
+    ) {
+        DetailDiaryResponseDTO detailDiaryResponseDTO = new DetailDiaryResponseDTO();
+        detailDiaryResponseDTO.setId(projection.getDiaryId());
+        detailDiaryResponseDTO.setTitle(projection.getDiaryTitle());
+        detailDiaryResponseDTO.setContent(projection.getDiaryContent());
+        detailDiaryResponseDTO.setUserLiked(projection.getIsUserLiked());
+        detailDiaryResponseDTO.setLikeCount(projection.getLikeCount());
+        detailDiaryResponseDTO.setStartDate(projection.getStartDate());
+        detailDiaryResponseDTO.setEndDate(projection.getEndDate());
+        detailDiaryResponseDTO.setTags(tags);
+        detailDiaryResponseDTO.setComments(comments);
+        return detailDiaryResponseDTO;
+    }
+}

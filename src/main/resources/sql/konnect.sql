@@ -79,11 +79,13 @@ DROP TABLE IF EXISTS `routes`;
 
 CREATE TABLE `routes` (
                           `id`	int	NOT NULL auto_increment,
-                          `no`	int	NOT NULL	COMMENT '명소코드',
                           `diary_id`	bigint	NOT NULL,
                           `visitedDate` VARCHAR(20),
                           `visitedTime` VARCHAR(20),
                           `distance` double,
+                          `title` varchar(500),
+                          `latitude`	decimal(20,17)	NOT NULL	COMMENT '위도',
+                          `longitude`	decimal(20,17)	NOT NULL	COMMENT '경도',
                           PRIMARY KEY (`id`)
 );
 
