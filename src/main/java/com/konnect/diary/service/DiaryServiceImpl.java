@@ -71,6 +71,7 @@ public class DiaryServiceImpl implements DiaryService {
     }
 
     @Override
+
     @Transactional
     public CreateDiaryResponseDTO publishDraft(
             CreateDiaryDraftRequestDTO dto,
@@ -255,11 +256,13 @@ public class DiaryServiceImpl implements DiaryService {
             String date = dayDto.getDate();
             for (DiaryRouteDetailDTO item : dayDto.getItems()) {
                 Route route = Route.builder()
-                        .attraction(attractionRepository.getReferenceById(item.getAttractionNo()))         // 명소코드
                         .diary(diary)
                         .visitedDate(date)
                         .visitedTime(item.getVisitedTime())
                         .distance(item.getDistance())
+                        .title(item.getTitle())
+                        .latitude(item.getLatitude())
+                        .longitude(item.getLongitude())
                         .build();
                 entities.add(route);
             }

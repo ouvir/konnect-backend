@@ -17,4 +17,13 @@ public class DiaryRouteDetailDTO {
 
     @Schema(description = "이동 거리 (미터)", example = "1200.5", required = false)
     private Double distance;
+
+    @Schema(description = "목적지 이름", example = "역삼 멀티캠퍼스")
+    private String title;
+
+    @Schema(description = "위도 (latitude)", example = "33.48901123456789012")
+    private Double latitude;
+
+    @Schema(description = "경도 (longitude)", example = "126.49830123456789012")
+    private Double longitude;
 }
