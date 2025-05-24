@@ -20,4 +20,7 @@ public class AreaEntity {
     private Long id;
 
     private String name;
+
+    @Column(name = "name_eng")
+    private String nameEng;
 }
