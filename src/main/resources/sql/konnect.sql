@@ -84,8 +84,8 @@ CREATE TABLE `routes` (
                           `visitedTime` VARCHAR(20),
                           `distance` double,
                           `title` varchar(500),
-                          `latitude`	decimal(20,17)	NOT NULL	COMMENT '위도',
-                          `longitude`	decimal(20,17)	NOT NULL	COMMENT '경도',
+                          `latitude`	double	NOT NULL	COMMENT '위도',
+                          `longitude`	double	NOT NULL	COMMENT '경도',
                           PRIMARY KEY (`id`)
 );
 

@@ -35,11 +35,11 @@ public class Route {
     @Schema(description = "명소 제목", example = "경복궁")
     private String title;
 
-    @Column(precision = 20, scale = 17, nullable = false)
+    @Column(nullable = false)
     @Schema(description = "위도", example = "37.5796170")
     private Double latitude;
 
-    @Column(precision = 20, scale = 17, nullable = false)
+    @Column(nullable = false)
     @Schema(description = "경도", example = "126.9770410")
     private Double longitude;
 
