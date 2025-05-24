@@ -1,11 +1,15 @@
 package com.konnect.diary.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "여행 경로 항목 DTO")
 public class DiaryRouteDetailDTO {
     @Schema(description = "방문 날짜 (yyyy-MM-dd)", example = "2025-06-01", required = true)

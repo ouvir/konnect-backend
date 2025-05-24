@@ -12,6 +12,8 @@ import java.util.Optional;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "드래프트 저장 요청 DTO")
 public class CreateDiaryDraftRequestDTO {
     private Optional<Long> diaryId = Optional.empty();
