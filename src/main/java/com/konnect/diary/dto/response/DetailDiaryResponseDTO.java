@@ -36,8 +36,8 @@ public class DetailDiaryResponseDTO {
     ) {
         DetailDiaryResponseDTO detailDiaryResponseDTO = new DetailDiaryResponseDTO();
         detailDiaryResponseDTO.setId(projection.getDiaryId());
-        detailDiaryResponseDTO.setTitle(projection.getDiaryTitle());
-        detailDiaryResponseDTO.setContent(projection.getDiaryContent());
+        detailDiaryResponseDTO.setTitle(projection.getTitle());
+        detailDiaryResponseDTO.setContent(projection.getContent());
         detailDiaryResponseDTO.setUserLiked(projection.getIsUserLiked());
         detailDiaryResponseDTO.setLikeCount(projection.getLikeCount());
         detailDiaryResponseDTO.setStartDate(projection.getStartDate());

@@ -7,8 +7,8 @@ import java.util.ArrayList;
 
 public interface DetailDiaryProjection {
     Long getDiaryId();
-    String getDiaryTitle();
-    String getDiaryContent();
+    String getTitle();
+    String getContent();
     boolean getIsUserLiked();
     Integer getLikeCount();
     String getStartDate();
