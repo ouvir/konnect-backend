@@ -3,6 +3,7 @@ package com.konnect.route.controller;
 import com.konnect.auth.dto.CustomUserPrincipal;
 import com.konnect.route.dto.RouteCreateRequest;
 import com.konnect.route.dto.RouteDetailResponse;
+import com.konnect.route.dto.RouteReorderRequest;
 import com.konnect.route.dto.RouteUpdateRequest;
 import com.konnect.route.service.RouteService;
 import com.konnect.util.SearchCondition;
@@ -42,7 +43,7 @@ public class RouteController {
     })
     @PostMapping
     public ResponseEntity<RouteDetailResponse> create(
-            @Valid  @RequestBody @Parameter(description = "루트 생성 요청 본문", required = true)
+            @Valid @RequestBody @Parameter(description = "루트 생성 요청 본문", required = true)
             RouteCreateRequest req,
             @Parameter(hidden = true)
             @AuthenticationPrincipal
@@ -110,5 +111,53 @@ public class RouteController {
 
         routeService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reorder")
+    @Operation(
+            summary = "루트 순서 재정렬",
+            description = """
+                        • 프론트에서 정렬된 <code>routeIds</code>,
+                          각 루트의 <code>visitedDates</code>, <code>visitedTimes</code>,
+                          구간 <code>distances</code> 를 한 번에 전송합니다.  
+                        • 마지막 루트는 distance 값이 없습니다.
+                    """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "재정렬 성공"),
+            @ApiResponse(responseCode = "400", description = "리스트 길이 불일치", content = @Content)
+    })
+    public ResponseEntity<Void> reorder(
+            @Valid @RequestBody RouteReorderRequest req) {
+
+        List<Long> ids = req.routeIds();
+        List<String> dates = req.visitedDates();
+        List<String> times = req.visitedTimes();
+        List<Double> ds = req.distances();
+
+        /* ---------- 간단한 길이 검증 ---------- */
+        if (ids.isEmpty()
+                || ids.size() != dates.size()
+                || ids.size() != times.size()
+                || ds.size() != ids.size() - 1) {
+
+            throw new IllegalArgumentException("리스트 길이가 맞지 않습니다.");
+        }
+
+        /* ---------- 순서대로 업데이트 ---------- */
+        for (int i = 0; i < ids.size(); i++) {
+            Double distance = (i < ds.size()) ? ds.get(i) : null;   // 마지막 루트는 null
+            routeService.update(
+                    ids.get(i),
+                    new RouteUpdateRequest(
+                            dates.get(i),
+                            times.get(i),
+                            null,           // attractionNo 변경 없음
+                            distance
+                    )
+            );
+        }
+
+        return ResponseEntity.ok().build();
     }
 }
