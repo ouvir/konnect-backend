@@ -1,6 +1,6 @@
 package com.konnect.diary.service;
 
-import com.konnect.tag.TagResponseDTO;
+import com.konnect.attraction.repository.AttractionRepository;
 import com.konnect.comment.CommentRepository;
 import com.konnect.comment.dto.CommentDto;
 import com.konnect.diary.dto.*;
@@ -11,9 +11,12 @@ import com.konnect.diary.repository.DiaryRepository;
 import com.konnect.diary.repository.DiaryTagRepository;
 import com.konnect.diary.repository.ListDiaryProjection;
 import com.konnect.diary.service.exception.DiaryRuntimeException;
-import com.konnect.tag.TagEntity;
 import com.konnect.repository.AreaRepository;
+import com.konnect.route.entity.Route;
+import com.konnect.route.repository.RouteRepository;
+import com.konnect.tag.TagEntity;
 import com.konnect.tag.TagRepository;
+import com.konnect.tag.TagResponseDTO;
 import com.konnect.user.repository.UserRepository;
 import com.konnect.util.DateTimeUtils;
 import com.konnect.util.FileStorage;
@@ -42,6 +45,8 @@ public class DiaryServiceImpl implements DiaryService {
     private final TagRepository tagRepository;
     private final AreaRepository areaRepository;
     private final UserRepository userRepository;
+    private final RouteRepository routeRepository;
+    private final AttractionRepository attractionRepository;
 
     private final ImageManager imageManager;
     private final FileStorage fileStorage;
@@ -104,7 +109,6 @@ public class DiaryServiceImpl implements DiaryService {
         return DetailDiaryDTO.from(projection, tags, comments);
     }
 
-    // ———————————— 헬퍼 1: Pageable 생성 분리
     private Pageable createPageable(boolean topOnly, DiarySortType sortType) {
         Sort sort = switch (sortType) {
             case RECENT     -> Sort.by(Sort.Direction.DESC, "created_at");
@@ -114,14 +118,12 @@ public class DiaryServiceImpl implements DiaryService {
         return PageRequest.of(0, size, sort);
     }
 
-    // ———————————— 헬퍼 2: Projection → Response 로 전환
     private List<ListDiaryResponseDTO> toResponseList(Page<ListDiaryProjection> pages) {
         return pages.getContent().stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
-    // ———————————— 헬퍼 3: 개별 Projection → DTO 변환
     private ListDiaryResponseDTO toResponse(ListDiaryProjection p) {
         List<TagResponseDTO> tags = diaryTagRepository
                 .findTop3ByDiary_DiaryIdOrderByIdAsc(p.getDiaryId())
@@ -190,6 +192,7 @@ public class DiaryServiceImpl implements DiaryService {
         diary.setCreatedAt(DateTimeUtils.getNowDateString());
         diary = diaryRepository.save(diary);
         syncTags(diary, dto.getTags());
+        syncRoutes(diary, dto.getRoutes());
 
         byte[] thumbBytes = readBytesOrNull(thumbnail,    "thumbnail");
         List<byte[]> imgBytes = readBytesList(imageFiles, "image");
@@ -234,6 +237,27 @@ public class DiaryServiceImpl implements DiaryService {
             System.out.println("DiaryServiceImpl: syncTags" + ex.getMessage());
             throw new DiaryRuntimeException("Failed to sync tags: " + ex.getMessage());
         }
+    }
+
+    private void syncRoutes(DiaryEntity diary, List<CreateDiaryRouteDTO> dayRoutes) {
+        routeRepository.deleteByDiaryDiaryId(diary.getDiaryId());
+
+        List<Route> entities = new ArrayList<>();
+        for (CreateDiaryRouteDTO dayDto : dayRoutes) {
+            String date = dayDto.getDate();
+            for (DiaryRouteDTO item : dayDto.getItems()) {
+                Route route = Route.builder()
+                        .attraction(attractionRepository.getReferenceById(item.getAttractionNo()))         // 명소코드
+                        .diary(diary)
+                        .visitedDate(date)
+                        .visitedTime(item.getVisitedTime())
+                        .distance(item.getDistance())
+                        .build();
+                entities.add(route);
+            }
+        }
+
+        routeRepository.saveAll(entities);
     }
 
     private void validateForPublish(
