@@ -1,6 +1,6 @@
 package com.konnect.diary.service;
 
-import com.konnect.auth.dto.TagResponseDTO;
+import com.konnect.tag.TagResponseDTO;
 import com.konnect.comment.CommentRepository;
 import com.konnect.comment.dto.CommentDto;
 import com.konnect.diary.dto.*;
@@ -11,9 +11,9 @@ import com.konnect.diary.repository.DiaryRepository;
 import com.konnect.diary.repository.DiaryTagRepository;
 import com.konnect.diary.repository.ListDiaryProjection;
 import com.konnect.diary.service.exception.DiaryRuntimeException;
-import com.konnect.entity.TagEntity;
+import com.konnect.tag.TagEntity;
 import com.konnect.repository.AreaRepository;
-import com.konnect.repository.TagRepository;
+import com.konnect.tag.TagRepository;
 import com.konnect.user.repository.UserRepository;
 import com.konnect.util.DateTimeUtils;
 import com.konnect.util.FileStorage;
@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -103,17 +102,6 @@ public class DiaryServiceImpl implements DiaryService {
                 .toList();
 
         return DetailDiaryDTO.from(projection, tags, comments);
-    }
-
-    private void createDraft(
-            CreateDiaryDraftRequestDTO dto,
-            MultipartFile thumbnail,
-            List<MultipartFile> imageFiles
-    ) {
-        DiaryEntity diary = new DiaryEntity();
-        diary.setTitle(dto.getTitle());
-        diary.setUser(userRepository.getReferenceById(dto.getUserId()));
-        diary.setContent(dto.getContent().orElse(null));
     }
 
     // ———————————— 헬퍼 1: Pageable 생성 분리

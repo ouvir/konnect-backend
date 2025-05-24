@@ -1,6 +1,5 @@
-package com.konnect.auth.dto;
+package com.konnect.tag;
 
-import com.konnect.entity.TagEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

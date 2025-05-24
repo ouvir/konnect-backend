@@ -1,6 +1,6 @@
 package com.konnect.diary.dto;
 
-import com.konnect.auth.dto.TagResponseDTO;
+import com.konnect.tag.TagResponseDTO;
 import com.konnect.diary.entity.DiaryEntity;
 import com.konnect.diary.entity.DiaryTagEntity;
 import lombok.AllArgsConstructor;

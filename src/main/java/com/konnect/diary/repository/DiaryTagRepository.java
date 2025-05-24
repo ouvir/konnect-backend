@@ -1,10 +1,8 @@
 package com.konnect.diary.repository;
 
-import com.konnect.auth.dto.TagResponseDTO;
 import com.konnect.diary.entity.DiaryEntity;
 import com.konnect.diary.entity.DiaryTagEntity;
-import com.konnect.entity.TagEntity;
-import org.springframework.data.domain.Sort;
+import com.konnect.tag.TagEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

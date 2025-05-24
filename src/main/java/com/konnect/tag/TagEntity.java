@@ -1,4 +1,4 @@
-package com.konnect.entity;
+package com.konnect.tag;
 
 import jakarta.persistence.*;
 import lombok.*;

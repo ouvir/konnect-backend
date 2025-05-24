@@ -1,6 +1,6 @@
 package com.konnect.diary.entity;
 
-import com.konnect.entity.TagEntity;
+import com.konnect.tag.TagEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
