@@ -10,14 +10,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface DiaryService {
-    CreateDiaryResponseDTO createDiaryDraft(
+    CreateDiaryResponseDTO createDiary(
             CreateDiaryDraftRequestDTO requestDTO,
+            Long userId,
             MultipartFile thumbnail,
             List<MultipartFile> imageFiles
     );
 
-    CreateDiaryResponseDTO publishDraft(
+    CreateDiaryResponseDTO editDiary(
             CreateDiaryDraftRequestDTO dto,
+            Long userId,
             MultipartFile thumbnail,
             List<MultipartFile> imageFiles
     );

@@ -1,5 +1,6 @@
 package com.konnect.diary.dto.request;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -22,9 +23,6 @@ public class CreateDiaryDraftRequestDTO {
     @Schema(description = "제목", example = "Summer Trip to Jeju", required = true)
     private String title;
 
-    @Schema(description = "유저 ID", example = "1", required = true)
-    private Long userId;
-
     @Schema(description = "본문 내용", example = "제주도의 아름다운 해변...", required = false)
     private Optional<String> content = Optional.empty();
 
@@ -42,11 +40,15 @@ public class CreateDiaryDraftRequestDTO {
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "날짜 형식은 yyyy-MM-dd 이어야 합니다.")
     private Optional<String> endDate = Optional.empty();
 
-    @Schema(
-            description = "하루 단위 여행 경로 리스트",
-            required = true,
-            type = "array",
-            implementation = DiaryRouteDTO.class
+    @Schema(description = "임시저장/게시 여부", example = "임시저장: editing / 게시: published")
+    private String status;
+
+    @ArraySchema(
+            arraySchema = @Schema(
+                    description = "하루 단위 여행 경로 리스트",
+                    requiredMode = Schema.RequiredMode.REQUIRED
+            ),
+            schema = @Schema(implementation = DiaryRouteDTO.class)
     )
     private List<DiaryRouteDTO> routes = new ArrayList<>();
 }

@@ -1,5 +1,6 @@
 package com.konnect.diary.dto.request;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,10 +16,12 @@ public class DiaryRouteDTO {
     @Schema(description = "여행 날짜 (yyyy-MM-dd)", example = "2025-06-01", required = true)
     private String date;
 
-    @Schema(
-            description = "해당 날짜의 경로 항목 리스트",
-            required = true,
-            implementation = DiaryRouteDetailDTO.class
+    @ArraySchema(
+            arraySchema = @Schema(
+                    description = "해당 날짜의 경로 상세 리스트",
+                    requiredMode = Schema.RequiredMode.REQUIRED
+            ),
+            schema = @Schema(implementation = DiaryRouteDetailDTO.class)
     )
     private List<DiaryRouteDetailDTO> items;
 }

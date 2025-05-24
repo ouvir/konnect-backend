@@ -1,7 +1,7 @@
 package com.konnect.diary.service;
 
-import java.util.LinkedHashMap;
 import com.konnect.comment.CommentRepository;
+import com.konnect.comment.CommentService;
 import com.konnect.comment.dto.CommentDto;
 import com.konnect.diary.dto.DiarySortType;
 import com.konnect.diary.dto.request.AreaRequestDTO;
@@ -38,15 +38,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class DiaryServiceImpl implements DiaryService {
+
+    private final CommentService commentService;
 
     private final DiaryRepository diaryRepository;
     private final DiaryTagRepository diaryTagRepository;
@@ -57,27 +56,58 @@ public class DiaryServiceImpl implements DiaryService {
 
     private final ImageManager imageManager;
     private final FileStorage fileStorage;
-    private final CommentRepository commentRepository;
 
     @Override
     @Transactional
-    public CreateDiaryResponseDTO createDiaryDraft(
+    public CreateDiaryResponseDTO createDiary(
             CreateDiaryDraftRequestDTO dto,
+            Long userId,
             MultipartFile thumbnail,
             List<MultipartFile> imageFiles
     ) {
-        return upsertAndSaveDraft(dto, thumbnail, imageFiles, false);
+        byte[] thumbBytes = readBytesOrNull(thumbnail, "thumbnail");
+        List<byte[]> imgBytes  = readBytesList(imageFiles, "image");
+
+        DiaryEntity diary = new DiaryEntity();
+        applyCommonFields(diary, dto, userId);
+        diary.setStatus(dto.getStatus());
+        diaryRepository.save(diary);
+
+        syncTags(diary, dto.getTags());
+        syncRoutes(diary, dto.getRoutes());
+        imageManager.saveAllImages(diary.getDiaryId(), thumbnail, imageFiles);
+
+        return buildResponse(diary, thumbBytes, imgBytes, dto.getRoutes());
     }
 
     @Override
-
     @Transactional
-    public CreateDiaryResponseDTO publishDraft(
+    public CreateDiaryResponseDTO editDiary(
             CreateDiaryDraftRequestDTO dto,
+            Long userId,
             MultipartFile thumbnail,
             List<MultipartFile> imageFiles
     ) {
-        return upsertAndSaveDraft(dto, thumbnail, imageFiles, true);
+        byte[] thumbBytes = readBytesOrNull(thumbnail, "thumbnail");
+        List<byte[]> imgBytes  = readBytesList(imageFiles, "image");
+
+        Long id = dto.getDiaryId()
+                .orElseThrow(() -> new DiaryRuntimeException("Diary ID is required"));
+        DiaryEntity diary = diaryRepository.findById(id)
+                .orElseThrow(() -> new DiaryRuntimeException("Draft not found: " + id));
+        if ("published".equalsIgnoreCase(diary.getStatus())) {
+            throw new DiaryRuntimeException("Cannot modify a published diary: " + id);
+        }
+
+        applyCommonFields(diary, dto, userId);
+        diary.setStatus("editing");
+        diaryRepository.save(diary);
+
+        syncTags(diary, dto.getTags());
+        syncRoutes(diary, dto.getRoutes());
+        imageManager.saveAllImages(diary.getDiaryId(), thumbnail, imageFiles);
+
+        return buildResponse(diary, thumbBytes, imgBytes, dto.getRoutes());
     }
 
     @Override
@@ -109,11 +139,7 @@ public class DiaryServiceImpl implements DiaryService {
                 .map(t -> new TagResponseDTO(t.getTagId(), t.getName(), t.getNameEng()))
                 .toList();
         List<DiaryRouteDTO> routeDtos = fetchRoutes(diaryId);
-        List<CommentDto> comments = commentRepository
-                .findByDiaryIdAndParentIsNullAndIsDeletedFalseOrderByCreatedAtAsc(diaryId)
-                .stream()
-                .map(CommentDto::from)
-                .toList();
+        List<CommentDto> comments = commentService.getCommentsByDiary(diaryId);
 
         return DetailDiaryResponseDTO.from(projection, tags, routeDtos, comments);
     }
@@ -191,39 +217,10 @@ public class DiaryServiceImpl implements DiaryService {
                 .build();
     }
 
-    private CreateDiaryResponseDTO upsertAndSaveDraft(
-            CreateDiaryDraftRequestDTO dto,
-            MultipartFile thumbnail,
-            List<MultipartFile> imageFiles,
-            boolean publish
-    ) {
-        if (publish && dto.getDiaryId() == null) {
-            throw new DiaryRuntimeException("Cannot publish: draftId must be provided");
-        }
-
-        DiaryEntity diary;
-        if (dto.getDiaryId().isPresent()) {
-            Long id = dto.getDiaryId().get();
-            DiaryEntity existing = diaryRepository.findById(id)
-                    .orElseThrow(() -> new DiaryRuntimeException(
-                            "Draft not found: " + id));
-
-            if ("published".equals(existing.getStatus())) {
-                throw new DiaryRuntimeException(
-                        "Cannot modify a published diary: " + id);
-            }
-
-            if (!"editing".equals(existing.getStatus())) {
-                throw new DiaryRuntimeException(
-                        "Draft is not in an editable state: " + id);
-            }
-
-            diary = existing;
-        } else {
-            diary = new DiaryEntity();
-        }
-
-        diary.setUser(userRepository.getReferenceById(dto.getUserId()));
+    private void applyCommonFields(DiaryEntity diary,
+                                   CreateDiaryDraftRequestDTO dto,
+                                   Long userId) {
+        diary.setUser(userRepository.getReferenceById(userId));
         diary.setTitle(dto.getTitle());
         diary.setContent(dto.getContent().orElse(null));
         diary.setArea(dto.getAreaId()
@@ -231,35 +228,24 @@ public class DiaryServiceImpl implements DiaryService {
                 .orElse(null));
         diary.setStartDate(dto.getStartDate().orElse(null));
         diary.setEndDate(dto.getEndDate().orElse(null));
-        String status = publish ? "published" : "editing";
-        diary.setStatus(status);
         diary.setCreatedAt(DateTimeUtils.getNowDateString());
-        diary = diaryRepository.save(diary);
-        syncTags(diary, dto.getTags());
-        syncRoutes(diary, dto.getRoutes());
+    }
 
-        byte[] thumbBytes = readBytesOrNull(thumbnail,    "thumbnail");
-        List<byte[]> imgBytes = readBytesList(imageFiles, "image");
+    private CreateDiaryResponseDTO buildResponse(
+            DiaryEntity diary,
+            byte[] thumbBytes,
+            List<byte[]> imgBytes,
+            List<DiaryRouteDTO> routes
+    ) {
+        String thumbBase64 = thumbBytes == null
+                ? null
+                : "data:image/*;base64," + Base64.getEncoder().encodeToString(thumbBytes);
 
-        try {
-            imageManager.saveAllImages(diary.getDiaryId(), thumbnail, imageFiles);
-        } catch (Exception ex) {
-            throw new DiaryRuntimeException("Failed to store images for diary " + diary.getDiaryId());
-        }
-
-        if (publish) {
-            validateForPublish(diary, thumbnail, imageFiles);
-            diary.setStatus("published");
-            diary.setCreatedAt(DateTimeUtils.getNowDateString());
-            diary = diaryRepository.save(diary);
-        }
-
-        String thumbBase64 = toBase64(thumbnail, thumbBytes);
-        List<String> imgsBase64 = imgBytes.stream()
+        List<String> imgBase64 = imgBytes.stream()
                 .map(b -> "data:image/*;base64," + Base64.getEncoder().encodeToString(b))
-                .collect(Collectors.toList());
+                .toList();
 
-        return CreateDiaryResponseDTO.from(diary, thumbBase64, imgsBase64, dto.getRoutes());
+        return CreateDiaryResponseDTO.from(diary, thumbBase64, imgBase64, routes);
     }
 
     private void syncTags(DiaryEntity diary, List<Long> tagIds) {
@@ -306,21 +292,6 @@ public class DiaryServiceImpl implements DiaryService {
         routeRepository.saveAll(entities);
     }
 
-    private void validateForPublish(
-            DiaryEntity diary,
-            MultipartFile thumbnail,
-            List<MultipartFile> imageFiles
-    ) {
-        if (diary.getTitle() == null || diary.getTitle().isBlank()
-                || diary.getArea() == null
-                || diary.getContent() == null || diary.getContent().isBlank()
-                || diary.getTags().isEmpty()
-                || diary.getStartDate() == null || diary.getEndDate() == null
-        ) {
-            throw new DiaryRuntimeException("Cannot publish: missing required fields");
-        }
-    }
-
     private byte[] readBytesOrNull(MultipartFile file, String who) {
         if (file == null || file.isEmpty()) return null;
         try {
@@ -344,11 +315,4 @@ public class DiaryServiceImpl implements DiaryService {
         }
         return list;
     }
-
-    private String toBase64(MultipartFile file, byte[] bytes) {
-        if (bytes == null) return null;
-        String prefix = "data:" + file.getContentType() + ";base64,";
-        return prefix + Base64.getEncoder().encodeToString(bytes);
-    }
-
 }

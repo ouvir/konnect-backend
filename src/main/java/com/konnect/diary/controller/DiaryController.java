@@ -24,35 +24,32 @@ public class DiaryController implements DiaryAPI {
   
     private final DiaryService diaryService;
 
-    @PostMapping(path = "/user/diaries/draft")
+    @PostMapping(path = "/user/diaries")
     @ResponseBody
-    public ResponseEntity<CreateDiaryResponseDTO> saveDraft(
+    public ResponseEntity<CreateDiaryResponseDTO> createDiary(
             @RequestPart("data") CreateDiaryDraftRequestDTO requestDTO,
             @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail,
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
-        requestDTO.setUserId(userDetails == null ? 1 : userDetails.getId());
         CreateDiaryResponseDTO dto =
-                diaryService.createDiaryDraft(requestDTO, thumbnail, imageFiles);
-        HttpStatus status = dto.getDiaryId() == null ? HttpStatus.CREATED : HttpStatus.OK;
-        return ResponseEntity.status(status).body(dto);
+                diaryService.createDiary(requestDTO, userDetails == null ? 1 : userDetails.getId(), thumbnail, imageFiles);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
     @Override
-    @PostMapping("/user/diaries/{diaryId}/publish")
+    @PostMapping("/user/diaries/{diaryId}")
     @ResponseBody
-    public ResponseEntity<CreateDiaryResponseDTO> publishDiary(
+    public ResponseEntity<CreateDiaryResponseDTO> editDiary(
             @PathVariable Long diaryId,
             @RequestPart("data") CreateDiaryDraftRequestDTO requestDTO,
             @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail,
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
-        requestDTO.setUserId(userDetails == null ? 1 : userDetails.getId());
         requestDTO.setDiaryId(Optional.ofNullable(diaryId));
         CreateDiaryResponseDTO dto =
-                diaryService.publishDraft(requestDTO, thumbnail, imageFiles);
+                diaryService.editDiary(requestDTO, userDetails.getId(), thumbnail, imageFiles);
         HttpStatus status = dto.getDiaryId() == null ? HttpStatus.CREATED : HttpStatus.OK;
         return ResponseEntity.status(status).body(dto);
     }

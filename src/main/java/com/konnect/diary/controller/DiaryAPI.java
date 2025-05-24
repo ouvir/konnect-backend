@@ -27,21 +27,13 @@ import java.util.List;
 @Tag(name = "다이어리", description = "다이어리 관련 API")
 public interface DiaryAPI {
     @Operation(
-            summary = "임시저장 다이어리 생성/수정",
-            description = "드래프트(draft) 상태인 다이어리를 생성하거나 업데이트합니다."
+            summary = "다이어리 생성",
+            description = "드래프트(draft) 상태인 다이어리를 생성하거나 새로운 다이어리를 게시합니다."
     )
     @ApiResponses({
             @ApiResponse(
-                    responseCode = "200",
-                    description = "드래프트 수정 성공",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = CreateDiaryResponseDTO.class)
-                    )
-            ),
-            @ApiResponse(
                     responseCode = "201",
-                    description = "드래프트 생성 성공",
+                    description = "다이어리 생성 성공",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = CreateDiaryResponseDTO.class)
@@ -50,7 +42,7 @@ public interface DiaryAPI {
             @ApiResponse(responseCode = "400", description = "잘못된 입력값", content = @Content),
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content)
     })
-    public ResponseEntity<CreateDiaryResponseDTO> saveDraft(
+    public ResponseEntity<CreateDiaryResponseDTO> createDiary(
             @Parameter(
                     description = "드래프트 저장 요청 DTO",
                     required = true,
@@ -75,9 +67,12 @@ public interface DiaryAPI {
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     );
 
-    public ResponseEntity<CreateDiaryResponseDTO> publishDiary(
+    @Operation(
+            summary = "다이어리 수정",
+            description = "이미 생성된 다이어리를 수정합니다. 수정중인 다이어리를 게시할 수 있습니다."
+    )
+    public ResponseEntity<CreateDiaryResponseDTO> editDiary(
             @PathVariable Long diaryId,
-
             @Parameter(
                     description = "다이어리 게시 요청 DTO",
                     required = true,

@@ -5,6 +5,8 @@ import com.konnect.route.dto.RouteDetailResponse;
 import com.konnect.tag.TagResponseDTO;
 import com.konnect.diary.entity.DiaryEntity;
 import com.konnect.diary.entity.DiaryTagEntity;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -25,6 +27,14 @@ public class CreateDiaryResponseDTO {
     private String startDate;
     private String endDate;
     private List<TagResponseDTO> tags;
+
+    @ArraySchema(
+            arraySchema = @Schema(
+                    description = "하루 단위 여행 경로 리스트 (day별)",
+                    requiredMode = Schema.RequiredMode.REQUIRED
+            ),
+            schema = @Schema(implementation = DiaryRouteDTO.class)
+    )
     private List<DiaryRouteDTO> routes;
 
     private String thumbnailImage;
