@@ -4,20 +4,18 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "tags")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class TagEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tag_id")
     private Long tagId;
 
-    private String name;
-
-    @Column(name = "name_eng")
-    private String nameEng;
+    @Column(nullable = false, name = "name")
+    private String name;      // 한글
+    @Column(nullable = false, name = "name_eng")
+    private String nameEng;   // 영문
 }

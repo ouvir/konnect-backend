@@ -10,8 +10,9 @@ import lombok.NoArgsConstructor;
 public class TagResponseDTO {
     private Long tagId;
     private String name;
+    private String name_eng;
 
     public static TagResponseDTO from(TagEntity tag) {
-        return new TagResponseDTO(tag.getTagId(), tag.getName());
+        return new TagResponseDTO(tag.getTagId(), tag.getName(), tag.getNameEng());
     }
 }

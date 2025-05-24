@@ -12,6 +12,19 @@ repositories {
     mavenCentral()
 }
 
+/* ──────────────── Spring AI BOM 추가 ──────────────── */
+/* 1) Milestone 저장소 추가 */
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }   // Spring AI 1.0.0-M6 배포 위치
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.ai:spring-ai-bom:1.0.0-M6"   // Spring AI 전체 버전 일괄 관리
+    }
+}
+
 dependencies {
     /* ──────────────── Spring Boot & JPA ──────────────── */
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -52,6 +65,9 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
     runtimeOnly   'io.jsonwebtoken:jjwt-impl:0.12.3'
     runtimeOnly   'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+    /* ──────────────── Spring AI + OpenAI ──────────────── */
+    implementation "org.springframework.ai:spring-ai-openai-spring-boot-starter"
 
     /* ──────────────── 테스트 ──────────────── */
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

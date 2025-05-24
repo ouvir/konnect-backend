@@ -106,7 +106,7 @@ public class DiaryServiceImpl implements DiaryService {
         List<TagResponseDTO> tags = diaryTagRepository
                 .findTop3ByDiary_DiaryIdOrderByIdAsc(diaryId)
                 .stream()
-                .map(t -> new TagResponseDTO(t.getTagId(), t.getName()))
+                .map(t -> new TagResponseDTO(t.getTagId(), t.getName(), t.getNameEng()))
                 .toList();
         List<DiaryRouteDTO> routeDtos = fetchRoutes(diaryId);
         List<CommentDto> comments = commentRepository
@@ -172,7 +172,7 @@ public class DiaryServiceImpl implements DiaryService {
         List<TagResponseDTO> tags = diaryTagRepository
                 .findTop3ByDiary_DiaryIdOrderByIdAsc(p.getDiaryId())
                 .stream()
-                .map(t -> new TagResponseDTO(t.getTagId(), t.getName()))
+                .map(t -> new TagResponseDTO(t.getTagId(), t.getName(), t.getNameEng()))
                 .collect(Collectors.toList());
 
         String thumbnail = fileStorage.loadThumbnailBase64(p.getDiaryId());

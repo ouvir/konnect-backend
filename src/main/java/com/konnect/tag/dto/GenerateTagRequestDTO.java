@@ -15,7 +15,4 @@ public class GenerateTagRequestDTO {
     @NotBlank
     @Schema(description = "제목 또는 본문 내용 전체 문자열", example = "힐링이 필요한 여행이었다. 산책도 하고 사진도 찍었다.")
     private String content;
-
-    @Schema(description = "이미 선택된 태그 ID 리스트", example = "[1, 5]")
-    private List<Long> existingTags;
 }
