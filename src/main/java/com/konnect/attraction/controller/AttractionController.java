@@ -45,7 +45,7 @@ public class AttractionController {
             @Parameter(description = "관광지 제목 키워드", example = "백년")
             @RequestParam(required = false) String title,
 
-            @Parameter(description = "관광지 지역 키워드", example = "서울")
+            @Parameter(description = "관광지 지역 키워드 \n ('기타' 입력 시, '서울', '전주', '부산', '제주', '여수' 가 포함되지 않은 데이터 반환)", example = "서울")
             @RequestParam(required = false) String area,
 
             @Parameter(description = "관광지 지역 코드", example = "1")

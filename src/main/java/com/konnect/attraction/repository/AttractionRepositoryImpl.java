@@ -30,7 +30,32 @@ public class AttractionRepositoryImpl implements AttractionRepositoryCustom {
             where.and(attraction.title.containsIgnoreCase(condition.get("title")));
         }
         if (condition.has("area")) {
-            where.and(attraction.addr1.containsIgnoreCase(condition.get("area")));
+            String areaText = condition.get("area");
+            if(areaText.equals("기타")) {
+                // '서울', '전주', '부산', '제주', '여수' 가 포함되지 않은 행만 선택
+                BooleanBuilder etc = new BooleanBuilder()
+                        .and(attraction.addr1.containsIgnoreCase("서울").not())
+                        .and(attraction.sido.sidoName.containsIgnoreCase("서울").not())
+
+                        .and(attraction.addr1.containsIgnoreCase("전주").not())
+                        .and(attraction.gugun.gugunName.containsIgnoreCase("전주").not())
+
+                        .and(attraction.addr1.containsIgnoreCase("부산").not())
+                        .and(attraction.sido.sidoName.containsIgnoreCase("부산").not())
+
+                        .and(attraction.addr1.containsIgnoreCase("제주").not())
+                        .and(attraction.sido.sidoName.containsIgnoreCase("제주").not())
+                        .and(attraction.gugun.gugunName.containsIgnoreCase("제주").not())
+
+                        .and(attraction.addr1.containsIgnoreCase("여수").not())
+                        .and(attraction.gugun.gugunName.containsIgnoreCase("여수").not());
+
+                where.and(etc);
+            } else {
+                where.and(attraction.sido.sidoName.containsIgnoreCase(areaText)
+                        .or(attraction.gugun.gugunName.containsIgnoreCase(areaText))
+                );
+            }
         }
         if (condition.has("areaCode")) {
             Integer areaCode = Integer.parseInt(condition.get("areaCode"));
