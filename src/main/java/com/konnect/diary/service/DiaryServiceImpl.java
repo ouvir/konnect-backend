@@ -101,9 +101,11 @@ public class DiaryServiceImpl implements DiaryService {
                 .orElseThrow(() -> new DiaryRuntimeException("Diary ID is required"));
         DiaryEntity diary = diaryRepository.findById(id)
                 .orElseThrow(() -> new DiaryRuntimeException("Draft not found: " + id));
-        if ("published".equalsIgnoreCase(diary.getStatus())) {
-            throw new DiaryRuntimeException("Cannot modify a published diary: " + id);
-        }
+
+        // 게시 관련 비지니스 로직
+//        if ("published".equalsIgnoreCase(diary.getStatus())) {
+//            throw new DiaryRuntimeException("Cannot modify a published diary: " + id);
+//        }
 
         applyCommonFields(diary, dto, userId);
         diary.setStatus(dto.getStatus());
@@ -130,7 +132,7 @@ public class DiaryServiceImpl implements DiaryService {
                 Sort.by(Sort.Order.asc("status"), Sort.Order.desc("created_at"))
         );
         Page<ListDiaryProjection> pages = diaryRepository.fetchMyDiaries(userId, pageable);
-        return toResponseList(pages);
+        return toResponseMyList(pages);
     }
 
     @Override
@@ -214,6 +216,12 @@ public class DiaryServiceImpl implements DiaryService {
                 .collect(Collectors.toList());
     }
 
+    private List<ListDiaryResponseDTO> toResponseMyList(Page<ListDiaryProjection> pages) {
+        return pages.getContent().stream()
+                .map(this::toResponseMine)
+                .collect(Collectors.toList());
+    }
+
     private ListDiaryResponseDTO toResponse(ListDiaryProjection p) {
         List<TagResponseDTO> tags = diaryTagRepository
                 .findTop3ByDiary_DiaryIdOrderByIdAsc(p.getDiaryId())
@@ -221,7 +229,9 @@ public class DiaryServiceImpl implements DiaryService {
                 .map(t -> new TagResponseDTO(t.getTagId(), t.getName(), t.getNameEng()))
                 .collect(Collectors.toList());
 
-        String thumbnail = fileStorage.loadThumbnailBase64(p.getDiaryId());
+        ImageData imageData = fileStorage.loadImage(p.getDiaryId());
+        String thumbnail = imageData.getThumbnailBase64();
+
         AreaRequestDTO area     = new AreaRequestDTO(p.getAreaId(), p.getAreaName(), p.getAreaNameEng());
 
         return ListDiaryResponseDTO.builder()
@@ -234,6 +244,34 @@ public class DiaryServiceImpl implements DiaryService {
                 .startDate(p.getStartDate())
                 .endDate(p.getEndDate())
                 .tags(tags)
+                .build();
+    }
+
+    private ListDiaryResponseDTO toResponseMine(ListDiaryProjection p) {
+        List<TagResponseDTO> tags = diaryTagRepository
+                .findTop3ByDiary_DiaryIdOrderByIdAsc(p.getDiaryId())
+                .stream()
+                .map(t -> new TagResponseDTO(t.getTagId(), t.getName(), t.getNameEng()))
+                .collect(Collectors.toList());
+
+        ImageData imageData = fileStorage.loadImage(p.getDiaryId());
+        String thumbnail = imageData.getThumbnailBase64();
+        List<String> images = imageData.getImagesBase64();
+//        log.info("images: {}", images);
+
+        AreaRequestDTO area     = new AreaRequestDTO(p.getAreaId(), p.getAreaName(), p.getAreaNameEng());
+
+        return ListDiaryResponseDTO.builder()
+                .diaryId(p.getDiaryId())
+                .title(p.getTitle())
+                .status(p.getStatus())
+                .thumbnail(thumbnail)
+                .area(area)
+                .likeCount(p.getLikeCount())
+                .startDate(p.getStartDate())
+                .endDate(p.getEndDate())
+                .tags(tags)
+                .images(images)
                 .build();
     }
 

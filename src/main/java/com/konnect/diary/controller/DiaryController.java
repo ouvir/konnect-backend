@@ -77,8 +77,11 @@ public class DiaryController implements DiaryAPI {
             if (imageFiles == null) imageFiles = new ArrayList<>();
             int idx = imageFiles.size() + 1;
             for (String b64 : req.getImages()) {
+                // Base64 문자열에서 content-type 추출
+                String contentType = b64.substring(b64.indexOf(':') + 1, b64.indexOf(';')); // ex) image/jpeg
+                String ext = contentType.substring(contentType.indexOf('/') + 1);
                 imageFiles.add(
-                        new Base64DecodedMultipartFile(b64, "image" + idx, "image" + idx++)
+                        new Base64DecodedMultipartFile(b64, "image" + idx, idx++ + "." + ext)
                 );
             }
         }
