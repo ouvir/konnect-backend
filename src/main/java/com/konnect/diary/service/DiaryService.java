@@ -2,6 +2,7 @@ package com.konnect.diary.service;
 
 import com.konnect.diary.dto.*;
 import com.konnect.diary.dto.request.CreateDiaryDraftRequestDTO;
+import com.konnect.diary.dto.request.EditDiaryRequestDTO;
 import com.konnect.diary.dto.response.CreateDiaryResponseDTO;
 import com.konnect.diary.dto.response.DetailDiaryResponseDTO;
 import com.konnect.diary.dto.response.ListDiaryResponseDTO;
@@ -18,7 +19,7 @@ public interface DiaryService {
     );
 
     CreateDiaryResponseDTO editDiary(
-            CreateDiaryDraftRequestDTO dto,
+            EditDiaryRequestDTO dto,
             Long userId,
             MultipartFile thumbnail,
             List<MultipartFile> imageFiles

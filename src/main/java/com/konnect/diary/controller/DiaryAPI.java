@@ -2,6 +2,7 @@ package com.konnect.diary.controller;
 
 import com.konnect.auth.dto.CustomUserPrincipal;
 import com.konnect.diary.dto.request.CreateDiaryDraftRequestDTO;
+import com.konnect.diary.dto.request.EditDiaryRequestDTO;
 import com.konnect.diary.dto.response.CreateDiaryResponseDTO;
 import com.konnect.diary.dto.DiarySortType;
 import com.konnect.diary.dto.response.DetailDiaryResponseDTO;
@@ -77,9 +78,9 @@ public interface DiaryAPI {
             @Parameter(
                     description = "다이어리 게시 요청 DTO",
                     required = true,
-                    schema = @Schema(implementation = CreateDiaryDraftRequestDTO.class)
+                    schema = @Schema(implementation = EditDiaryRequestDTO.class)
             )
-            @RequestPart("data") CreateDiaryDraftRequestDTO requestDTO,
+            @RequestPart("data") EditDiaryRequestDTO requestDTO,
 
             @Parameter(
                     description = "썸네일 이미지 파일 (optional)",

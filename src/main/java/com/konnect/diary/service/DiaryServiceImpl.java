@@ -3,10 +3,7 @@ package com.konnect.diary.service;
 import com.konnect.comment.CommentService;
 import com.konnect.comment.dto.CommentDto;
 import com.konnect.diary.dto.DiarySortType;
-import com.konnect.diary.dto.request.AreaRequestDTO;
-import com.konnect.diary.dto.request.CreateDiaryDraftRequestDTO;
-import com.konnect.diary.dto.request.DiaryRouteDTO;
-import com.konnect.diary.dto.request.DiaryRouteDetailDTO;
+import com.konnect.diary.dto.request.*;
 import com.konnect.diary.dto.response.CreateDiaryResponseDTO;
 import com.konnect.diary.dto.response.DetailDiaryResponseDTO;
 import com.konnect.diary.dto.response.ListDiaryResponseDTO;
@@ -88,17 +85,17 @@ public class DiaryServiceImpl implements DiaryService {
     @Override
     @Transactional
     public CreateDiaryResponseDTO editDiary(
-            CreateDiaryDraftRequestDTO dto,
+            EditDiaryRequestDTO dto,
             Long userId,
             MultipartFile thumbnail,
             List<MultipartFile> imageFiles
     ) {
         byte[] thumbBytes = readBytesOrNull(thumbnail, "thumbnail");
-        log.info("thumbnail: {}", thumbnail);
-        log.info("thumbBytes: {}", thumbBytes);
+        if(thumbBytes == null) {
+            log.info("thumbnail: {}", thumbnail);
+            log.info("thumbBytes: {}", thumbBytes);
+        }
         List<byte[]> imgBytes  = readBytesList(imageFiles, "image");
-        log.info("imageFiles: {}", imageFiles);
-        log.info("imgBytes: {}", imgBytes);
 
         Long id = dto.getDiaryId()
                 .orElseThrow(() -> new DiaryRuntimeException("Diary ID is required"));
@@ -243,6 +240,22 @@ public class DiaryServiceImpl implements DiaryService {
     private void applyCommonFields(
             DiaryEntity diary,
             CreateDiaryDraftRequestDTO dto,
+            Long userId
+    ) {
+        diary.setUser(userRepository.getReferenceById(userId));
+        diary.setTitle(dto.getTitle());
+        diary.setContent(dto.getContent().orElse(null));
+        diary.setArea(dto.getAreaId()
+                .map(areaRepository::getReferenceById)
+                .orElse(null));
+        diary.setStartDate(dto.getStartDate().orElse(null));
+        diary.setEndDate(dto.getEndDate().orElse(null));
+        diary.setCreatedAt(DateTimeUtils.getNowDateString());
+    }
+
+    private void applyCommonFields(
+            DiaryEntity diary,
+            EditDiaryRequestDTO dto,
             Long userId
     ) {
         diary.setUser(userRepository.getReferenceById(userId));
