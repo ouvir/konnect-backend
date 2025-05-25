@@ -24,6 +24,8 @@ import com.konnect.route.repository.RouteRepository;
 import com.konnect.tag.TagEntity;
 import com.konnect.tag.TagRepository;
 import com.konnect.tag.TagResponseDTO;
+import com.konnect.user.dto.UserInfoDTO;
+import com.konnect.user.entity.UserEntity;
 import com.konnect.user.repository.UserRepository;
 import com.konnect.util.DateTimeUtils;
 import com.konnect.util.FileStorage;
@@ -133,6 +135,10 @@ public class DiaryServiceImpl implements DiaryService {
             throw new DiaryRuntimeException("cannot find diary with id: " + diaryId);
 
         DetailDiaryProjection projection = diaryRepository.fetchDiaryDetail(diaryId, userId);
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new DiaryRuntimeException("User not found: " + userId));
+
+        UserInfoDTO userInfoDTO = new UserInfoDTO(userEntity.getUserId(), userEntity.getName());
         List<TagResponseDTO> tags = diaryTagRepository
                 .findTop3ByDiary_DiaryIdOrderByIdAsc(diaryId)
                 .stream()
@@ -141,7 +147,7 @@ public class DiaryServiceImpl implements DiaryService {
         List<DiaryRouteDTO> routeDtos = fetchRoutes(diaryId);
         List<CommentDto> comments = commentService.getCommentsByDiary(diaryId);
 
-        return DetailDiaryResponseDTO.from(projection, tags, routeDtos, comments);
+        return buildResponse(projection, userInfoDTO, tags, routeDtos, comments);
     }
 
     private List<DiaryRouteDTO> fetchRoutes(Long diaryId) {
@@ -229,6 +235,28 @@ public class DiaryServiceImpl implements DiaryService {
         diary.setStartDate(dto.getStartDate().orElse(null));
         diary.setEndDate(dto.getEndDate().orElse(null));
         diary.setCreatedAt(DateTimeUtils.getNowDateString());
+    }
+
+    private DetailDiaryResponseDTO buildResponse(
+            DetailDiaryProjection p,
+            UserInfoDTO userInfo,
+            List<TagResponseDTO> tags,
+            List<DiaryRouteDTO> routes,
+            List<CommentDto> comments
+    ) {
+        return DetailDiaryResponseDTO.builder()
+                .id(p.getDiaryId())
+                .userInfo(userInfo)
+                .title(p.getTitle())
+                .content(p.getContent())
+                .likeCount(p.getLikeCount())
+                .isUserLiked(p.getIsUserLiked())
+                .startDate(p.getStartDate())
+                .endDate(p.getEndDate())
+                .tags(tags)
+                .routes(routes)
+                .comments(comments)
+                .build();
     }
 
     private CreateDiaryResponseDTO buildResponse(
