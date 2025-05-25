@@ -16,9 +16,14 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
         FROM diaries d
         JOIN areas a ON a.area_id = d.area_id
         LEFT JOIN ( 
-                SELECT diary_id, COUNT(*) AS cnt FROM likes WHERE is_deleted = FALSE GROUP BY diary_id
+                SELECT diary_id, COUNT(*) AS cnt 
+                FROM likes 
+                WHERE is_deleted = FALSE 
+                GROUP BY diary_id
         ) l ON l.diary_id = d.diary_id
-        WHERE d.area_id = :areaId AND d.status = 'published'
+        WHERE d.area_id = :areaId 
+           AND d.status = 'published'
+           AND d.is_deleted = FALSE
         """,
         countQuery = """
         SELECT COUNT(*)
@@ -38,14 +43,18 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
         FROM diaries d
         JOIN areas a ON a.area_id = d.area_id
         LEFT JOIN (
-                SELECT diary_id, COUNT(*) AS cnt FROM likes WHERE is_deleted = FALSE GROUP BY diary_id
+                SELECT diary_id, COUNT(*) AS cnt 
+                FROM likes
+                WHERE is_deleted = FALSE
+                GROUP BY diary_id
         ) l ON l.diary_id = d.diary_id
         WHERE d.user_id = :userId
+            AND d.is_deleted = FALSE
         """,
         countQuery = """
             SELECT COUNT(*)
             FROM diaries d
-            WHERE d.user_id = :userId 
+            WHERE d.user_id = :userId
         """,
         nativeQuery = true
     )
@@ -65,9 +74,10 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
       LEFT JOIN LikeEntity l
         ON l.isDeleted = FALSE
         AND l.user.userId = :userId
-        AND l.isDeleted = FALSE
       WHERE d.diaryId = :diaryId
-      """)
+        AND d.isDeleted = false
+      """
+    )
     DetailDiaryProjection fetchDiaryDetail(
             @Param("diaryId") Long diaryId,
             @Param("userId")  Long userId

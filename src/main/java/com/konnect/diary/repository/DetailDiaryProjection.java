@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 public interface DetailDiaryProjection {
     Long getDiaryId();
+    String getUsername();
     String getTitle();
     String getContent();
     boolean getIsUserLiked();
@@ -14,5 +15,4 @@ public interface DetailDiaryProjection {
     String getStartDate();
     String getEndDate();
     ArrayList<TagEntity> getTags();
-    ArrayList<CommentDto> getComments();
 }

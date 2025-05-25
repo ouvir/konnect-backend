@@ -80,4 +80,13 @@ public class DiaryController implements DiaryAPI {
         DetailDiaryResponseDTO dto = diaryService.fetchDiaryDetail(diaryId, userDetails == null ? 1 : userDetails.getId());
         return ResponseEntity.ok(dto);
     }
+
+    @DeleteMapping("/user/diaries/{diaryId}")
+    public ResponseEntity<HttpStatus> deleteDiary(
+            @PathVariable Long diaryId,
+            @AuthenticationPrincipal CustomUserPrincipal userDetails
+    ) {
+        diaryService.deleteDiary(diaryId);
+        return ResponseEntity.ok().build();
+    }
 }
