@@ -27,7 +27,7 @@ public class RouteController {
     /* -------------------- CREATE -------------------- */
     private final RouteCommandService routeCommandService;
 
-    @PostMapping("/add-attraction")
+    @PostMapping
     @Operation(
             summary = "루트 추가 - 명소 기반",
             description = """
@@ -42,13 +42,18 @@ public class RouteController {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 다이어리 또는 명소 ID", content = @Content),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 형식", content = @Content)
     })
-    public ResponseEntity<RouteDTO> createRoute(
+    public ResponseEntity<?> createRoute(
             @RequestBody
             @Parameter(description = "루트 추가 요청 본문", required = true, schema = @Schema(implementation = RouteAddAttractionRequest.class))
             RouteAddAttractionRequest req
             ) {
-        RouteDTO saved = routeCommandService.addRoute(req);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        // TODO UserID 넣어서, 자신의 다이어리인지 검증 필요
+        try {
+            RouteDTO saved = routeCommandService.addRoute(req);
+            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 //    /* -------------------- LIST -------------------- */
 //    @GetMapping

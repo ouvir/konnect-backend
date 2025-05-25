@@ -21,10 +21,14 @@ public class RouteCommandService {
     private final AttractionRepository attractionRepo;
     private final RouteRepository routeRepo;
 
-    public RouteDTO addRoute(RouteAddAttractionRequest req) {
+    public RouteDTO addRoute(RouteAddAttractionRequest req) throws IllegalArgumentException {
 
         DiaryEntity diary = diaryRepo.findById(req.getDiaryId())
                 .orElseThrow(() -> new IllegalArgumentException("다이어리 없음"));
+
+        if(diary.getStatus().equals("published")) {
+            throw new IllegalArgumentException("다이어리 수정 불가");
+        }
 
         Attraction attraction = attractionRepo.findById(req.getAttractionNo())
                 .orElseThrow(() -> new IllegalArgumentException("명소 없음"));
