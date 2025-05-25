@@ -20,7 +20,7 @@ public class ImageManager {
         fileStorage.saveAll(diaryId, thumbnail, imageFiles);
     }
 
-    public String loadThumbnailImage(Long diaryId) {
+    public String loadthumbnail(Long diaryId) {
         return fileStorage.loadThumbnailBase64(diaryId);
     }
 

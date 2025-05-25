@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TagResponseDTO {
-    private Long tagId;
+    private Long id;
     private String name;
     private String nameEng;
 

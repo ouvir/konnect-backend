@@ -13,7 +13,7 @@ public class ListDiaryResponseDTO {
     private Long diaryId;
     private String title;
     private String status;
-    private String thumbnailImage;
+    private String thumbnail;
     private AreaRequestDTO area;
     private Long likeCount;
     private String startDate;
@@ -21,11 +21,11 @@ public class ListDiaryResponseDTO {
     private List<TagResponseDTO> tags;
 
     @Builder
-    public ListDiaryResponseDTO(Long diaryId, String title, String status, String thumbnailImage, AreaRequestDTO area, Long likeCount, String startDate, String endDate, List<TagResponseDTO> tags) {
+    public ListDiaryResponseDTO(Long diaryId, String title, String status, String thumbnail, AreaRequestDTO area, Long likeCount, String startDate, String endDate, List<TagResponseDTO> tags) {
         this.diaryId = diaryId;
         this.title = title;
         this.status = status;
-        this.thumbnailImage = thumbnailImage;
+        this.thumbnail = thumbnail;
         this.area = area;
         this.likeCount = likeCount;
         this.startDate = startDate;

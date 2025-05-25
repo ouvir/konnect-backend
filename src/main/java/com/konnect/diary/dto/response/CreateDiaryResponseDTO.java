@@ -36,10 +36,10 @@ public class CreateDiaryResponseDTO {
     )
     private List<DiaryRouteDTO> routes;
 
-    private String thumbnailImage;
+    private String thumbnail;
     private List<String> images;
 
-    public static CreateDiaryResponseDTO from(DiaryEntity diary, String thumbnailImage, List<String> images, List<DiaryRouteDTO> routes) {
+    public static CreateDiaryResponseDTO from(DiaryEntity diary, String thumbnail, List<String> images, List<DiaryRouteDTO> routes) {
         List<TagResponseDTO> tagResponses = new ArrayList<>();
         for (DiaryTagEntity diaryTag : diary.getTags()) {
             tagResponses.add(TagResponseDTO.from(diaryTag.getTag()));
@@ -54,7 +54,7 @@ public class CreateDiaryResponseDTO {
                 diary.getEndDate(),
                 tagResponses,
                 routes,
-                thumbnailImage,
+                thumbnail,
                 images
         );
     }

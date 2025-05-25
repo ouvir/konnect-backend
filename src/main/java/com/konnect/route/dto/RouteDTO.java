@@ -31,7 +31,7 @@ public class RouteDTO {
     @Schema(description = "경도", example = "126.977041")
     private Double longitude;
 
-    @Schema(description = "다음 명소까지 거리 (m)", example = "1500.0", nullable = true)
+    @Schema(description = "다음 명소까지 거리", example = "null", nullable = true)
     private Double distance;
 
     public static RouteDTO from(Route r) {

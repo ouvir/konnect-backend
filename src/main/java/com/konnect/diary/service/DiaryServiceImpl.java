@@ -32,6 +32,7 @@ import com.konnect.util.FileStorage;
 import com.konnect.util.ImageData;
 import com.konnect.util.ImageManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +47,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DiaryServiceImpl implements DiaryService {
 
     private final CommentService commentService;
@@ -92,7 +94,11 @@ public class DiaryServiceImpl implements DiaryService {
             List<MultipartFile> imageFiles
     ) {
         byte[] thumbBytes = readBytesOrNull(thumbnail, "thumbnail");
+        log.info("thumbnail: {}", thumbnail);
+        log.info("thumbBytes: {}", thumbBytes);
         List<byte[]> imgBytes  = readBytesList(imageFiles, "image");
+        log.info("imageFiles: {}", imageFiles);
+        log.info("imgBytes: {}", imgBytes);
 
         Long id = dto.getDiaryId()
                 .orElseThrow(() -> new DiaryRuntimeException("Diary ID is required"));
@@ -225,7 +231,7 @@ public class DiaryServiceImpl implements DiaryService {
                 .diaryId(p.getDiaryId())
                 .title(p.getTitle())
                 .status(p.getStatus())
-                .thumbnailImage(thumbnail)
+                .thumbnail(thumbnail)
                 .area(area)
                 .likeCount(p.getLikeCount())
                 .startDate(p.getStartDate())
