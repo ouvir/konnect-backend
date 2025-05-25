@@ -1,56 +1,55 @@
-//package com.konnect.route.controller;
-//
-//import com.konnect.auth.dto.CustomUserPrincipal;
-//import com.konnect.route.dto.*;
-//import com.konnect.route.service.RouteService;
-//import com.konnect.util.SearchCondition;
-//import io.swagger.v3.oas.annotations.Operation;
-//import io.swagger.v3.oas.annotations.Parameter;
-//import io.swagger.v3.oas.annotations.media.Content;
-//import io.swagger.v3.oas.annotations.media.Schema;
-//import io.swagger.v3.oas.annotations.responses.ApiResponse;
-//import io.swagger.v3.oas.annotations.responses.ApiResponses;
-//import io.swagger.v3.oas.annotations.tags.Tag;
-//import jakarta.validation.Valid;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.security.core.annotation.AuthenticationPrincipal;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.List;
-//
-//@RestController
-//@RequestMapping("/api/v1/user/routes")
-//@RequiredArgsConstructor
-//@Tag(name = "여행 경로", description = "다이어리에 포함된 루트 CRUD API (명소 정보 내장)")
-//public class RouteController {
-//
-//    private final RouteService routeService;
-//
-//    /* -------------------- CREATE -------------------- */
-//    @PostMapping
-//    @Operation(
-//            summary = "루트 생성",
-//            description = "다이어리(diaryId)에 방문 루트를 새로 등록합니다."
-//    )
-//    @ApiResponses({
-//            @ApiResponse(responseCode = "201", description = "생성 성공",
-//                    content = @Content(schema = @Schema(implementation = RouteDetailResponse.class))),
-//            @ApiResponse(responseCode = "404", description = "존재하지 않는 diaryId", content = @Content)
-//    })
-//    public ResponseEntity<RouteDetailResponse> create(
-//            @Valid @RequestBody
-//            @Parameter(description = "루트 생성 요청 본문", required = true)
-//            RouteCreateRequest req,
-//
-//            @AuthenticationPrincipal
-//            @Parameter(hidden = true) CustomUserPrincipal userDetails
-//    ) {
-//        RouteDetailResponse dto = routeService.create(req, userDetails.getId());
-//        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
-//    }
-//
+package com.konnect.route.controller;
+
+import com.konnect.route.dto.*;
+import com.konnect.route.service.RouteCommandService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/user/routes")
+@RequiredArgsConstructor
+@Tag(name = "큐레이션 여행 경로 추가", description = "다이어리에 포함된 루트 CRUD API (명소 정보 내장)")
+public class RouteController {
+
+    /* -------------------- CREATE -------------------- */
+    private final RouteCommandService routeCommandService;
+
+    @PostMapping("/add-attraction")
+    @Operation(
+            summary = "루트 추가 - 명소 기반",
+            description = """
+        사용자가 선택한 명소를 바탕으로 다이어리에 새로운 여행 루트를 추가합니다.
+        - 명소 번호(no)를 기준으로 위도, 경도, 제목 정보를 자동으로 채웁니다.
+        - 방문 시각은 기본값 '23:59'로 설정되며, 거리(distance)는 null로 저장됩니다.
+    """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "루트 추가 성공",
+                    content = @Content(schema = @Schema(implementation = RouteDTO.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 다이어리 또는 명소 ID", content = @Content),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식", content = @Content)
+    })
+    public ResponseEntity<RouteDTO> createRoute(
+            @RequestBody
+            @Parameter(description = "루트 추가 요청 본문", required = true, schema = @Schema(implementation = RouteAddAttractionRequest.class))
+            RouteAddAttractionRequest req
+            ) {
+        RouteDTO saved = routeCommandService.addRoute(req);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
 //    /* -------------------- LIST -------------------- */
 //    @GetMapping
 //    @Operation(
@@ -158,4 +157,4 @@
 //        }
 //        return ResponseEntity.ok().build();
 //    }
-//}
+}

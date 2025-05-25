@@ -68,10 +68,12 @@ public class Attraction {
     @Column(name = "homepage", length = 1000)
     private String homepage;
 
-    @Column(name = "overview", length = 10000)
+    @Lob
+    @Column(name = "overview", columnDefinition = "TEXT")
     private String overview;
 
-    @Column(name = "overview_eng", length = 10000)
+    @Lob
+    @Column(name = "overview_eng", columnDefinition = "TEXT")
     private String overviewEng;
     // getters and setters
 }

@@ -1,7 +1,6 @@
 package com.konnect.diary.dto.response;
 
 import com.konnect.diary.dto.request.DiaryRouteDTO;
-import com.konnect.route.dto.RouteDetailResponse;
 import com.konnect.tag.TagResponseDTO;
 import com.konnect.diary.entity.DiaryEntity;
 import com.konnect.diary.entity.DiaryTagEntity;

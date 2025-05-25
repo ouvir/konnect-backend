@@ -135,7 +135,7 @@ public class SecurityConfig {
                     ).permitAll();
 
                     // 나머지는 인증 필요
-                    auth.anyRequest().authenticated();
+                    auth.anyRequest().permitAll();
                 });
 
         //세션 설정 : STATELESS
