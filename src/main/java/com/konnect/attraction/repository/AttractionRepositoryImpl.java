@@ -68,6 +68,24 @@ public class AttractionRepositoryImpl implements AttractionRepositoryCustom {
             } catch (NumberFormatException ignored) {}
         }
 
+        if (condition.has("contentTypeName")) {
+            where.and(attraction.contentType.contentTypeName.eq(condition.get("contentTypeName")));
+        }
+
+        if (condition.has("curationTypeName")) {
+            String curationTypeName = condition.get("curationTypeName");
+            String curationType = switch(curationTypeName) {
+                case "Attractions" -> "관광지";
+                case "Stays" -> "숙박";
+                case "Restaurants" -> "레스토랑";
+                case "Shopping" -> "쇼핑";
+                default -> null;
+            };
+            if (curationType != null) {
+                where.and(attraction.contentType.contentTypeName.eq(curationType));
+            }
+        }
+
         long total = queryFactory
                 .select(attraction.count())
                 .from(attraction)
