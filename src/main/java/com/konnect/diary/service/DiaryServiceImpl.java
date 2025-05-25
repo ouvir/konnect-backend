@@ -103,7 +103,7 @@ public class DiaryServiceImpl implements DiaryService {
         }
 
         applyCommonFields(diary, dto, userId);
-        diary.setStatus("editing");
+        diary.setStatus(dto.getStatus());
         diaryRepository.save(diary);
 
         syncTags(diary, dto.getTags());

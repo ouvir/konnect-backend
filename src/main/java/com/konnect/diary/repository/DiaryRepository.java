@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
     @Query(value = """
-        SELECT d.diary_id AS diaryId, d.title AS title, d.area_id AS areaId, a.name AS areaName, a.name_eng AS areaNameEng COALESCE(l.cnt,0) AS likeCount, d.start_date AS startDate, d.end_date AS endDate, d.status
+        SELECT d.diary_id AS diaryId, d.title AS title, d.area_id AS areaId, a.name AS areaName, a.name_eng AS areaNameEng, COALESCE(l.cnt,0) AS likeCount, d.start_date AS startDate, d.end_date AS endDate, d.status
         FROM diaries d
         JOIN areas a ON a.area_id = d.area_id
         LEFT JOIN ( 
