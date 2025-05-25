@@ -12,10 +12,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,19 +23,13 @@ public class LocalFileStorageImpl implements FileStorage {
     private String storagePath;
 
     @Override
-    public void saveAll(
-            Long diaryId,
-            MultipartFile thumbnail,
-            List<MultipartFile> imageFiles
-    ) {
+    public void saveAll(Long diaryId, MultipartFile thumbnail, List<MultipartFile> imageFiles) {
         try {
             Path diaryDir = Paths.get(storagePath).resolve(diaryId.toString());
             Files.createDirectories(diaryDir);
 
             try (Stream<Path> entries = Files.list(diaryDir)) {
-                List<Path> thumbs = entries
-                        .filter(p -> p.getFileName().toString().startsWith("thumbnail"))
-                        .collect(Collectors.toList());
+                List<Path> thumbs = entries.filter(p -> p.getFileName().toString().startsWith("thumbnail")).collect(Collectors.toList());
                 for (Path oldThumb : thumbs) {
                     Files.deleteIfExists(oldThumb);
                 }
@@ -52,15 +43,11 @@ public class LocalFileStorageImpl implements FileStorage {
             Path imagesDir = diaryDir.resolve("images");
             if (imageFiles == null) {
                 if (Files.exists(imagesDir)) {
-                    Files.walk(imagesDir)
-                            .sorted(Comparator.reverseOrder())
-                            .forEach(p -> p.toFile().delete());
+                    Files.walk(imagesDir).sorted(Comparator.reverseOrder()).forEach(p -> p.toFile().delete());
                 }
             } else {
                 if (Files.exists(imagesDir)) {
-                    Files.walk(imagesDir)
-                            .sorted(Comparator.reverseOrder())
-                            .forEach(p -> p.toFile().delete());
+                    Files.walk(imagesDir).sorted(Comparator.reverseOrder()).forEach(p -> p.toFile().delete());
                 }
                 Files.createDirectories(imagesDir);
 
@@ -87,33 +74,36 @@ public class LocalFileStorageImpl implements FileStorage {
             return null;
         }
 
-        // thumbnail.* 패턴으로 디렉터리 스캔
-        try (DirectoryStream<Path> stream =
-                     Files.newDirectoryStream(diaryDir, "thumbnail.*")) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(diaryDir, "thumbnail.*")) {
 
             for (Path thumbPath : stream) {
                 if (Files.isRegularFile(thumbPath)) {
                     byte[] data = Files.readAllBytes(thumbPath);
-                    // 확장자 기반으로 MIME 타입 추출
                     String mimeType = Files.probeContentType(thumbPath);
                     if (mimeType == null) {
-                        // probe 실패 시, 확장자로 유추
                         String ext = getExtension(thumbPath.getFileName().toString()).toLowerCase();
                         switch (ext) {
-                            case ".png":  mimeType = "image/png";  break;
-                            case ".gif":  mimeType = "image/gif";  break;
-                            case ".bmp":  mimeType = "image/bmp";  break;
-                            case ".webp": mimeType = "image/webp"; break;
-                            default:      mimeType = "image/jpeg";
+                            case ".png":
+                                mimeType = "image/png";
+                                break;
+                            case ".gif":
+                                mimeType = "image/gif";
+                                break;
+                            case ".bmp":
+                                mimeType = "image/bmp";
+                                break;
+                            case ".webp":
+                                mimeType = "image/webp";
+                                break;
+                            default:
+                                mimeType = "image/jpeg";
                         }
                     }
-                    return "data:" + mimeType + ";base64," +
-                            Base64.getEncoder().encodeToString(data);
+                    return "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(data);
                 }
             }
-            // thumbnail.* 파일이 하나도 없으면 null
-            return null;
 
+            return null;
         } catch (IOException e) {
             throw new DiaryRuntimeException("Failed to load thumbnail for diary " + diaryId);
         }
@@ -124,29 +114,41 @@ public class LocalFileStorageImpl implements FileStorage {
         try {
             Path diaryDir = Paths.get(storagePath, diaryId.toString());
 
-            // 1) 썸네일 로드
             String thumbnailBase64 = null;
-            Path thumbPath = diaryDir.resolve("thumbnail.jpg");
-            if (Files.exists(thumbPath)) {
-                byte[] thumbBytes = Files.readAllBytes(thumbPath);
-                String mime = "image/" + getExtension(thumbPath.getFileName().toString()).substring(1);
-                thumbnailBase64 = "data:" + mime + ";base64," +
-                        Base64.getEncoder().encodeToString(thumbBytes);
+            if (Files.exists(diaryDir) && Files.isDirectory(diaryDir)) {
+                try (Stream<Path> files = Files.list(diaryDir)) {
+                    Optional<Path> thumbFile = files.filter(Files::isRegularFile).filter(p -> p.getFileName().toString().toLowerCase().startsWith("thumbnail.")).findFirst();
+
+                    if (thumbFile.isPresent()) {
+                        Path thumbPath = thumbFile.get();
+                        byte[] thumbBytes = Files.readAllBytes(thumbPath);
+
+                        String ext = thumbPath.getFileName().toString().substring(thumbPath.getFileName().toString().lastIndexOf('.') + 1).toLowerCase();
+                        String mime = "image/" + ext;
+
+                        thumbnailBase64 = "data:" + mime + ";base64," + Base64.getEncoder().encodeToString(thumbBytes);
+                    }
+                }
             }
 
             List<String> imagesBase64 = new ArrayList<>();
             Path imagesDir = diaryDir.resolve("images");
             if (Files.exists(imagesDir) && Files.isDirectory(imagesDir)) {
-                try (Stream<Path> paths = Files.list(imagesDir).sorted()) {
-                    paths.forEach(path -> {
-                        try {
-                            byte[] imgBytes = Files.readAllBytes(path);
-                            String mime = "image/" + getExtension(path.getFileName().toString()).substring(1);
-                            imagesBase64.add("data:" + mime + ";base64," +
-                                    Base64.getEncoder().encodeToString(imgBytes));
-                        } catch (IOException ignored) {
-                        }
-                    });
+                try (Stream<Path> files = Files.list(imagesDir)) {
+                    files.filter(Files::isRegularFile).sorted()
+                            .forEach(path -> {
+                                try {
+                                    byte[] imgBytes = Files.readAllBytes(path);
+
+                                    String ext = path.getFileName().toString().substring(path.getFileName().toString().lastIndexOf('.') + 1).toLowerCase();
+                                    String mime = "image/" + ext;
+
+                                    imagesBase64.add("data:" + mime + ";base64," + Base64.getEncoder().encodeToString(imgBytes));
+                                } catch (IOException ignored) {
+
+                                }
+                            }
+                    );
                 }
             }
 

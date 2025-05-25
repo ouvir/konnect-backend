@@ -22,6 +22,8 @@ public class DetailDiaryResponseDTO {
     private UserInfoDTO userInfo;
     private boolean isUserLiked;
     private Integer likeCount;
+    private String thumbnail;
+    private List<String> images;
     private String startDate;
     private String endDate;
     private List<TagResponseDTO> tags = new ArrayList<>();
