@@ -1,6 +1,5 @@
 package com.konnect.diary.service;
 
-import com.konnect.comment.CommentRepository;
 import com.konnect.comment.CommentService;
 import com.konnect.comment.dto.CommentDto;
 import com.konnect.diary.dto.DiarySortType;
@@ -29,6 +28,7 @@ import com.konnect.user.entity.UserEntity;
 import com.konnect.user.repository.UserRepository;
 import com.konnect.util.DateTimeUtils;
 import com.konnect.util.FileStorage;
+import com.konnect.util.ImageData;
 import com.konnect.util.ImageManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -150,6 +150,16 @@ public class DiaryServiceImpl implements DiaryService {
         return buildResponse(projection, userInfoDTO, tags, routeDtos, comments);
     }
 
+    @Override
+    public void deleteDiary(Long diaryId) {
+        DiaryEntity diary = diaryRepository.findById(diaryId)
+                .orElseThrow(() -> new DiaryRuntimeException("Diary not found: " + diaryId)
+        );
+
+        diary.setDeleted(true);
+        diaryRepository.save(diary);
+    }
+
     private List<DiaryRouteDTO> fetchRoutes(Long diaryId) {
         List<Route> routeEntities = routeRepository
                 .findAllByDiary_DiaryIdOrderByVisitedDateAscVisitedTimeAsc(diaryId);
@@ -223,9 +233,11 @@ public class DiaryServiceImpl implements DiaryService {
                 .build();
     }
 
-    private void applyCommonFields(DiaryEntity diary,
-                                   CreateDiaryDraftRequestDTO dto,
-                                   Long userId) {
+    private void applyCommonFields(
+            DiaryEntity diary,
+            CreateDiaryDraftRequestDTO dto,
+            Long userId
+    ) {
         diary.setUser(userRepository.getReferenceById(userId));
         diary.setTitle(dto.getTitle());
         diary.setContent(dto.getContent().orElse(null));
@@ -244,12 +256,16 @@ public class DiaryServiceImpl implements DiaryService {
             List<DiaryRouteDTO> routes,
             List<CommentDto> comments
     ) {
+        ImageData imageData = imageManager.loadImage(p.getDiaryId());
+
         return DetailDiaryResponseDTO.builder()
                 .id(p.getDiaryId())
                 .userInfo(userInfo)
                 .title(p.getTitle())
                 .content(p.getContent())
                 .likeCount(p.getLikeCount())
+                .thumbnail(imageData.getThumbnailBase64())
+                .images(imageData.getImagesBase64())
                 .isUserLiked(p.getIsUserLiked())
                 .startDate(p.getStartDate())
                 .endDate(p.getEndDate())
@@ -343,4 +359,6 @@ public class DiaryServiceImpl implements DiaryService {
         }
         return list;
     }
+
+
 }

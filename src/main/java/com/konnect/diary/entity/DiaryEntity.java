@@ -48,6 +48,7 @@ public class DiaryEntity {
     @Column(name = "created_at")
     private String createdAt;
 
-    // TODO: 여행 루트 컬럼 추가 예정
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
 
 }

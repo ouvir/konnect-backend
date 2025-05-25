@@ -29,4 +29,6 @@ public interface DiaryService {
     List<ListDiaryResponseDTO> fetchMyDiaries(Long userId);
 
     DetailDiaryResponseDTO fetchDiaryDetail(Long diaryId, Long userId);
+
+    void deleteDiary(Long diaryId);
 }
