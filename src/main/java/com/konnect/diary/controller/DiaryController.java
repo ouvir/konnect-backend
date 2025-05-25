@@ -53,7 +53,7 @@ public class DiaryController implements DiaryAPI {
     ) {
         requestDTO.setDiaryId(Optional.ofNullable(diaryId));
         CreateDiaryResponseDTO dto =
-                diaryService.editDiary(requestDTO, userDetails.getId(), thumbnail, imageFiles);
+                diaryService.editDiary(requestDTO, userDetails == null ? 1 : userDetails.getId(), thumbnail, imageFiles);
         HttpStatus status = dto.getDiaryId() == null ? HttpStatus.CREATED : HttpStatus.OK;
         return ResponseEntity.status(status).body(dto);
     }
