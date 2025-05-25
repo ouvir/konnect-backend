@@ -7,11 +7,13 @@ import java.util.ArrayList;
 
 public interface DetailDiaryProjection {
     Long getDiaryId();
-    String getUsername();
     String getTitle();
     String getContent();
-    boolean getIsUserLiked();
+    Integer getIsUserLiked();
     Integer getLikeCount();
+    Long getAreaId();
+    String getAreaName();
+    String getAreaNameEng();
     String getStartDate();
     String getEndDate();
     ArrayList<TagEntity> getTags();

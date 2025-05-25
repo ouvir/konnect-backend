@@ -1,5 +1,6 @@
 package com.konnect.diary.dto.response;
 
+import com.konnect.diary.dto.request.AreaRequestDTO;
 import com.konnect.diary.dto.request.DiaryRouteDTO;
 import com.konnect.tag.TagResponseDTO;
 import com.konnect.comment.dto.CommentDto;
@@ -19,6 +20,7 @@ public class DetailDiaryResponseDTO {
     private Long id;
     private String title;
     private String content;
+    private AreaRequestDTO area;
     private UserInfoDTO userInfo;
     private boolean isUserLiked;
     private Integer likeCount;

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
     @Query(value = """
-        SELECT d.diary_id AS diaryId, d.title AS title, d.area_id AS areaId, a.name AS areaName, COALESCE(l.cnt,0) AS likeCount, d.start_date AS startDate, d.end_date AS endDate, d.status
+        SELECT d.diary_id AS diaryId, d.title AS title, d.area_id AS areaId, a.name AS areaName, a.name_eng AS areaNameEng COALESCE(l.cnt,0) AS likeCount, d.start_date AS startDate, d.end_date AS endDate, d.status
         FROM diaries d
         JOIN areas a ON a.area_id = d.area_id
         LEFT JOIN ( 
@@ -39,7 +39,7 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
     );
 
     @Query(value = """
-        SELECT d.diary_id AS diaryId, d.title AS title, d.area_id AS areaId, a.name AS areaName, COALESCE(l.cnt,0) AS likeCount, d.start_date AS startDate, d.end_date AS endDate, d.status
+        SELECT d.diary_id AS diaryId, d.title AS title, d.area_id AS areaId, a.name AS areaName, a.name_eng AS areaNameEng, COALESCE(l.cnt,0) AS likeCount, d.start_date AS startDate, d.end_date AS endDate, d.status
         FROM diaries d
         JOIN areas a ON a.area_id = d.area_id
         LEFT JOIN (
@@ -60,23 +60,37 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
     )
     Page<ListDiaryProjection> fetchMyDiaries(@Param("userId") Long userId, Pageable pageable);
 
-    @Query("""
-      SELECT 
-        d.diaryId                 AS diaryId,
-        d.user.name          AS username,
-        COUNT(l)          AS likeCount,
-        d.title              AS title,
-        d.content            AS content,
-        FUNCTION('DATE_FORMAT', d.startDate, '%Y-%m-%d %H:%i:%s') AS startDate,
-        FUNCTION('DATE_FORMAT', d.endDate,   '%Y-%m-%d %H:%i:%s') AS endDate,
-        CASE WHEN COUNT(l) > 0 THEN TRUE ELSE FALSE END   AS isUserLiked
-      FROM DiaryEntity d
-      LEFT JOIN LikeEntity l
-        ON l.isDeleted = FALSE
-        AND l.user.userId = :userId
-      WHERE d.diaryId = :diaryId
-        AND d.isDeleted = false
-      """
+    @Query(value = """
+        SELECT 
+          d.diary_id      AS diaryId,
+          COALESCE(l.cnt,0) AS likeCount,
+          d.title         AS title,
+          d.content       AS content,
+          d.area_id       AS areaId,
+          a.name          AS areaName,
+          a.name_eng      AS areaNameEng,
+          DATE_FORMAT(d.start_date, '%Y-%m-%d %H:%i:%s') AS startDate,
+          DATE_FORMAT(d.end_date,   '%Y-%m-%d %H:%i:%s') AS endDate,
+          EXISTS (
+            SELECT 1
+            FROM likes lx
+            WHERE lx.diary_id = d.diary_id
+                AND lx.user_id    = :userId
+                AND lx.is_deleted = FALSE
+            ) AS isUserLiked
+        FROM diaries d
+          JOIN users  u ON d.user_id = u.user_id
+          JOIN areas  a ON d.area_id = a.area_id
+          LEFT JOIN (
+            SELECT diary_id, COUNT(*) AS cnt
+            FROM likes
+            WHERE is_deleted = FALSE
+            GROUP BY diary_id
+          ) l ON l.diary_id = d.diary_id
+        WHERE d.diary_id = :diaryId
+          AND d.is_deleted = FALSE
+        """,
+        nativeQuery = true
     )
     DetailDiaryProjection fetchDiaryDetail(
             @Param("diaryId") Long diaryId,

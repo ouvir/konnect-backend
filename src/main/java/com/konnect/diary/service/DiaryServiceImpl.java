@@ -17,6 +17,7 @@ import com.konnect.diary.repository.DiaryRepository;
 import com.konnect.diary.repository.DiaryTagRepository;
 import com.konnect.diary.repository.ListDiaryProjection;
 import com.konnect.diary.service.exception.DiaryRuntimeException;
+import com.konnect.entity.AreaEntity;
 import com.konnect.repository.AreaRepository;
 import com.konnect.route.entity.Route;
 import com.konnect.route.repository.RouteRepository;
@@ -218,7 +219,7 @@ public class DiaryServiceImpl implements DiaryService {
                 .collect(Collectors.toList());
 
         String thumbnail = fileStorage.loadThumbnailBase64(p.getDiaryId());
-        AreaRequestDTO area     = new AreaRequestDTO(p.getAreaId(), p.getAreaName());
+        AreaRequestDTO area     = new AreaRequestDTO(p.getAreaId(), p.getAreaName(), p.getAreaNameEng());
 
         return ListDiaryResponseDTO.builder()
                 .diaryId(p.getDiaryId())
@@ -257,16 +258,18 @@ public class DiaryServiceImpl implements DiaryService {
             List<CommentDto> comments
     ) {
         ImageData imageData = imageManager.loadImage(p.getDiaryId());
+        AreaRequestDTO areaDTO = new AreaRequestDTO(p.getAreaId(), p.getAreaName(), p.getAreaNameEng());
 
         return DetailDiaryResponseDTO.builder()
                 .id(p.getDiaryId())
                 .userInfo(userInfo)
+                .area(areaDTO)
                 .title(p.getTitle())
                 .content(p.getContent())
                 .likeCount(p.getLikeCount())
                 .thumbnail(imageData.getThumbnailBase64())
                 .images(imageData.getImagesBase64())
-                .isUserLiked(p.getIsUserLiked())
+                .isUserLiked(p.getIsUserLiked() != null && p.getIsUserLiked() == 1)
                 .startDate(p.getStartDate())
                 .endDate(p.getEndDate())
                 .tags(tags)

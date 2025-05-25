@@ -11,6 +11,8 @@ public interface ListDiaryProjection {
 
     String getAreaName();
 
+    String getAreaNameEng();
+
     Long getLikeCount();
 
     String getStartDate();

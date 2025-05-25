@@ -32,8 +32,12 @@ public class DiaryController implements DiaryAPI {
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
-        CreateDiaryResponseDTO dto =
-                diaryService.createDiary(requestDTO, userDetails == null ? 1 : userDetails.getId(), thumbnail, imageFiles);
+        CreateDiaryResponseDTO dto = diaryService.createDiary(
+                        requestDTO,
+                        userDetails == null ? 1 : userDetails.getId(),
+                        thumbnail,
+                        imageFiles
+                );
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
@@ -68,7 +72,8 @@ public class DiaryController implements DiaryAPI {
     public ResponseEntity<List<ListDiaryResponseDTO>> fetchMyDiaries(
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
-        List<ListDiaryResponseDTO> response = diaryService.fetchMyDiaries(userDetails == null ? 1 : userDetails.getId());
+        List<ListDiaryResponseDTO> response = diaryService
+                .fetchMyDiaries(userDetails == null ? 1 : userDetails.getId());
         return ResponseEntity.ok(response);
     }
 
