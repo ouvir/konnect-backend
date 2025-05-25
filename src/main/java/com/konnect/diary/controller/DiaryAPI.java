@@ -4,6 +4,7 @@ import com.konnect.auth.dto.CustomUserPrincipal;
 import com.konnect.diary.dto.request.CreateDiaryDraftRequestDTO;
 import com.konnect.diary.dto.response.CreateDiaryResponseDTO;
 import com.konnect.diary.dto.DiarySortType;
+import com.konnect.diary.dto.response.DetailDiaryResponseDTO;
 import com.konnect.diary.dto.response.ListDiaryResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -157,6 +158,25 @@ public interface DiaryAPI {
             ),
     })
     public ResponseEntity<List<ListDiaryResponseDTO>> fetchMyDiaries(
+            @AuthenticationPrincipal CustomUserPrincipal userDetails
+    );
+
+    @Operation(
+            summary     = "다이어리 상세 조회",
+            description = "주어진 ID의 다이어리 상세 정보를 조회합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description  = "조회 성공",
+                    content      = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema    = @Schema(implementation = DetailDiaryResponseDTO.class)
+                    )
+            ),
+    })
+    public ResponseEntity<DetailDiaryResponseDTO> fetchDiaryById(
+            @PathVariable Long diaryId,
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     );
 }
