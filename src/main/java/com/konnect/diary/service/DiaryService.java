@@ -25,6 +25,8 @@ public interface DiaryService {
             List<MultipartFile> imageFiles
     );
 
+    List<ListDiaryResponseDTO> fetchMostLikedDiariesFromAllAreas();
+
     List<ListDiaryResponseDTO> fetchDiaries(Long areaId, boolean topOnly, DiarySortType sortedBy);
 
     List<ListDiaryResponseDTO> fetchMyDiaries(Long userId);

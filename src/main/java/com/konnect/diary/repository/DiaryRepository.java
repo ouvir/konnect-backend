@@ -9,8 +9,41 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
+
+    @Query(value = """
+        SELECT 
+            d.diary_id       AS diaryId,
+            d.title          AS title,
+            d.area_id        AS areaId,
+            a.name           AS areaName,
+            a.name_eng       AS areaNameEng,
+            COALESCE(l.cnt, 0) AS likeCount,
+            d.start_date     AS startDate,
+            d.end_date       AS endDate,
+            d.status         AS status
+        FROM diaries d
+        JOIN areas a 
+          ON a.area_id = d.area_id
+        LEFT JOIN (
+            SELECT diary_id, COUNT(*) AS cnt
+            FROM likes
+            WHERE is_deleted = FALSE
+            GROUP BY diary_id
+        ) l 
+          ON l.diary_id = d.diary_id
+        WHERE d.is_deleted = FALSE
+          AND d.status    = 'published'
+        ORDER BY likeCount DESC, d.created_at DESC
+        LIMIT 4
+        """,
+            nativeQuery = true
+    )
+    List<ListDiaryProjection> fetchTop4PublishedByLikeCount();
+
     @Query(value = """
         SELECT d.diary_id AS diaryId, d.title AS title, d.area_id AS areaId, a.name AS areaName, a.name_eng AS areaNameEng, COALESCE(l.cnt,0) AS likeCount, d.start_date AS startDate, d.end_date AS endDate, d.status
         FROM diaries d

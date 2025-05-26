@@ -95,6 +95,11 @@ public class DiaryController implements DiaryAPI {
         return ResponseEntity.status(status).body(dto);
     }
 
+    @GetMapping("/all/diaries/mostLiked")
+    public ResponseEntity<List<ListDiaryResponseDTO>> fetchMostLikedDiariesFromAllAreas() {
+        return ResponseEntity.ok(diaryService.fetchMostLikedDiariesFromAllAreas());
+    }
+
     @GetMapping("/all/diaries")
     public ResponseEntity<List<ListDiaryResponseDTO>> fetchDiaries(
             @RequestParam(name = "areaId") Long areaId,

@@ -118,6 +118,13 @@ public class DiaryServiceImpl implements DiaryService {
         return buildResponse(diary, thumbBytes, imgBytes, dto.getRoutes());
     }
 
+    public List<ListDiaryResponseDTO> fetchMostLikedDiariesFromAllAreas() {
+        List<ListDiaryProjection> projections = diaryRepository.fetchTop4PublishedByLikeCount();
+        return projections.stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
     @Override
     public List<ListDiaryResponseDTO> fetchDiaries(Long areaId, boolean topOnly, DiarySortType sortedBy) {
         Pageable pageable = createPageable(topOnly, sortedBy);
