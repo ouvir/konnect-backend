@@ -124,6 +124,7 @@ public class DiaryController implements DiaryAPI {
             @PathVariable Long diaryId,
             @AuthenticationPrincipal CustomUserPrincipal userDetails
     ) {
+        log.info("로그 {}", userDetails == null ? "none" : userDetails.getId());
         DetailDiaryResponseDTO dto = diaryService.fetchDiaryDetail(diaryId, userDetails == null ? 1 : userDetails.getId());
         return ResponseEntity.ok(dto);
     }

@@ -9,6 +9,7 @@ public interface DetailDiaryProjection {
     Long getDiaryId();
     String getTitle();
     String getContent();
+    String getStatus();
     Integer getIsUserLiked();
     Integer getLikeCount();
     Long getAreaId();

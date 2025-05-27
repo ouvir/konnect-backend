@@ -143,6 +143,7 @@ public class DiaryServiceImpl implements DiaryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DetailDiaryResponseDTO fetchDiaryDetail(Long diaryId, Long userId) {
         if (!diaryRepository.existsById(diaryId))
             throw new DiaryRuntimeException("cannot find diary with id: " + diaryId);
@@ -151,7 +152,10 @@ public class DiaryServiceImpl implements DiaryService {
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new DiaryRuntimeException("User not found: " + userId));
 
-        UserInfoDTO userInfoDTO = new UserInfoDTO(userEntity.getUserId(), userEntity.getName());
+        DiaryEntity diary = diaryRepository.findById(diaryId).get();
+        UserEntity owner = diary.getUser();
+        UserInfoDTO userInfoDTO = new UserInfoDTO(owner.getUserId(), owner.getName());
+
         List<TagResponseDTO> tags = diaryTagRepository
                 .findTop3ByDiary_DiaryIdOrderByIdAsc(diaryId)
                 .stream()
@@ -330,6 +334,7 @@ public class DiaryServiceImpl implements DiaryService {
                 .area(areaDTO)
                 .title(p.getTitle())
                 .content(p.getContent())
+                .status(p.getStatus())
                 .likeCount(p.getLikeCount())
                 .thumbnail(imageData.getThumbnailBase64())
                 .images(imageData.getImagesBase64())

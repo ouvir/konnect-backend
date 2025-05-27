@@ -99,6 +99,7 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
           COALESCE(l.cnt,0) AS likeCount,
           d.title         AS title,
           d.content       AS content,
+          d.status        AS status,
           d.area_id       AS areaId,
           a.name          AS areaName,
           a.name_eng      AS areaNameEng,

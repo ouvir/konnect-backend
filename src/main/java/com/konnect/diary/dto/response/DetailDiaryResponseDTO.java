@@ -20,6 +20,7 @@ public class DetailDiaryResponseDTO {
     private Long id;
     private String title;
     private String content;
+    private String status;
     private AreaRequestDTO area;
     private UserInfoDTO userInfo;
     private boolean isUserLiked;

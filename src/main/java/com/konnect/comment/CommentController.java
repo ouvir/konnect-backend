@@ -2,6 +2,7 @@ package com.konnect.comment;
 
 import com.konnect.auth.dto.CustomUserPrincipal;
 import com.konnect.comment.dto.CommentDto;
+import com.konnect.comment.dto.CommentEditRequest;
 import com.konnect.comment.dto.CreateCommentRequest;
 import com.konnect.comment.dto.CreateReplyRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,8 +44,8 @@ public class CommentController {
     @PatchMapping("/{id}")
     public ResponseEntity<CommentDto> updateComment(@AuthenticationPrincipal CustomUserPrincipal userDetails,
                                                     @PathVariable("id") Long id,
-                                                    @RequestBody String content) {
-        return ResponseEntity.ok(commentService.updateComment(userDetails == null ? 1 : userDetails.getId(), id, content));
+                                                    @RequestBody CommentEditRequest content) {
+        return ResponseEntity.ok(commentService.updateComment(userDetails == null ? 1 : userDetails.getId(), id, content.getContent()));
     }
 
     @Operation(summary = "댓글 삭제", description = "댓글 또는 대댓글을 논리적으로 삭제합니다. 실제 DB에서 제거하지 않습니다.")

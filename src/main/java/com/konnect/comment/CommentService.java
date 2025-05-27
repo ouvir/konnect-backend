@@ -3,6 +3,8 @@ package com.konnect.comment;
 import com.konnect.comment.dto.CommentDto;
 import com.konnect.comment.dto.CreateCommentRequest;
 import com.konnect.comment.dto.CreateReplyRequest;
+import com.konnect.user.repository.UserRepository;
+import com.konnect.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 public class CommentService {
 
     private final CommentRepository commentRepository;
+    private final UserService userService;
 
     public List<CommentDto> getCommentsByDiary(Long diaryId) {
         List<Comment> roots = commentRepository.findByDiaryIdAndParentIsNullAndIsDeletedFalseOrderByCreatedAtAsc(diaryId);
@@ -24,6 +27,8 @@ public class CommentService {
 
     private CommentDto toDtoWithChildren(Comment comment) {
         CommentDto dto = CommentDto.from(comment);
+        String userName = userService.findById(comment.getUserId()).getName();
+        dto.setUserName(userName);
         List<Comment> children = commentRepository.findByParentCommentIdAndIsDeletedFalseOrderByCreatedAtAsc(comment.getCommentId());
         dto.setChildren(children.stream().map(CommentDto::from).collect(Collectors.toList()));
         return dto;
@@ -35,9 +40,14 @@ public class CommentService {
         comment.setUserId(userId);
         comment.setContent(request.getContent());
         comment.setCreatedAt(request.getCreatedAt());
+        comment.setCreatedAt(request.getCreatedAt());
         comment.setDeleted(false);
         comment.setParent(null);
-        return CommentDto.from(commentRepository.save(comment));
+
+        CommentDto dto = CommentDto.from(commentRepository.save(comment));
+        String userName = userService.findById(comment.getUserId()).getName();
+        dto.setUserName(userName);
+        return dto;
     }
 
     public CommentDto createReply(Long userId, CreateReplyRequest request) {
@@ -55,7 +65,11 @@ public class CommentService {
         reply.setCreatedAt(request.getCreatedAt());
         reply.setDeleted(false);
         reply.setParent(parent);
-        return CommentDto.from(commentRepository.save(reply));
+
+        CommentDto dto = CommentDto.from(commentRepository.save(reply));
+        String userName = userService.findById(reply.getUserId()).getName();
+        dto.setUserName(userName);
+        return dto;
     }
 
     public CommentDto updateComment(Long userId, Long id, String content) {
@@ -67,7 +81,11 @@ public class CommentService {
         }
 
         comment.setContent(content);
-        return CommentDto.from(commentRepository.save(comment));
+
+        CommentDto dto = CommentDto.from(commentRepository.save(comment));
+        String userName = userService.findById(comment.getUserId()).getName();
+        dto.setUserName(userName);
+        return dto;
     }
 
     public void deleteComment(Long userId, Long id) {

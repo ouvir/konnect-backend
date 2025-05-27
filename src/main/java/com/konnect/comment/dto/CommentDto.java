@@ -18,6 +18,9 @@ public class CommentDto {
     @Schema(description = "작성자 ID", example = "10")
     private Long userId;
 
+    @Schema(description = "작성자 이름", example = "김경훈")
+    private String userName;
+
     @Schema(description = "연결된 일기 ID", example = "100")
     private Long diaryId;
 
